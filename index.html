@@ -3737,6 +3737,9 @@ function fpStats(rows){
 }
 var _fpBusy=false;
 function fpErrTxt(e){ return e==="geo"?"Position indisponible : choisis un code postal dans les réglages du prix":(e==="zone"?"Indique un code postal":(e==="vide"?"Aucune station trouvée dans cette zone":"Prix indisponible : réseau bloqué ou hors ligne (fonctionne dans la version installée)")); }
+function fpDay(t){ var d=new Date(t); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
+function fpHistClean(){ var L=S.priceHist; if(!L||!L.length) return; var by={}, out=[]; L.slice().sort(function(a,b){return a.t-b.t;}).forEach(function(e){ by[fpDay(e.t)]=e; }); Object.keys(by).forEach(function(k){ out.push(by[k]); }); out.sort(function(a,b){return a.t-b.t;}); if(out.length!==L.length){ S.priceHist=out; save(); } }
+setTimeout(fpHistClean,900);
 function fpUpdate(manual){
   var cfg=fpCfg(); if(_fpBusy) return Promise.resolve(null); _fpBusy=true; S.fp.tryTs=Date.now();
   var fin=function(){ _fpBusy=false; };
@@ -3749,7 +3752,8 @@ function fpUpdate(manual){
   }).then(function(rows){
     var st=fpStats(rows), prev=S.fp.last?S.fp.last.v:null, now=Date.now(); st.ts=now; st.fuel=cfg.fuel; S.fp.last=st; S.fp.ts=now; S.fp.fail=0; delete S.fp.err;
     if(!S.priceHist) S.priceHist=[]; var lh=S.priceHist[S.priceHist.length-1];
-    if(!lh||Math.abs(lh.v-st.v)>=0.005||now-lh.t>20*36e5){ S.priceHist.push({t:now,v:st.v}); if(S.priceHist.length>150) S.priceHist.shift(); }
+    if(lh&&fpDay(lh.t)===fpDay(now)){ lh.v=st.v; lh.t=now; }   /* même jour : on met à jour l’entrée du jour, sans doublon */
+    else { S.priceHist.push({t:now,v:st.v}); if(S.priceHist.length>150) S.priceHist.shift(); }
     var changed=prev!==null&&Math.abs(st.v-prev)>=0.005; if(cfg.on) S.v.price=st.v; save(); fin(); fpPaint();
     if(changed) toast("Prix du litre mis à jour : "+n2(st.v,3)+" € ("+(st.v>=prev?"+":"−")+n2(Math.abs(st.v-prev),3)+")"); else if(manual) toast("Prix du litre : "+n2(st.v,3)+" € (à jour)");
     return st;
