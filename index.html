@@ -608,7 +608,7 @@ a.btn{display:inline-flex}
 .hmore{margin-top:10px}.hmore summary{list-style:none;cursor:pointer;font-size:13px;font-weight:600;color:var(--mut);padding:6px 0}
 .hmore summary::-webkit-details-marker{display:none}.hmore summary::after{content:" ›";display:inline-block;transition:transform .2s}
 .hmore[open] summary::after{transform:rotate(90deg)}
-.mapbox{position:relative;overflow:hidden;border-radius:22px;background:#0b1422;border:1px solid var(--line)}
+.mapbox{position:relative;overflow:hidden;border-radius:22px;background:#0b1422;border:1px solid var(--line);aspect-ratio:3/2}
 .mscale{position:absolute;left:0;top:0;width:360px;height:240px;transform-origin:0 0}
 .mtiles{position:absolute;inset:0;overflow:hidden;background:#e8e6e0;filter:var(--tf,none)}
 .mtiles img{position:absolute;width:256px;height:256px;max-width:none;display:block;user-select:none;-webkit-user-drag:none}
@@ -2773,6 +2773,7 @@ function tileInner(){
     '<button class="mbtn'+(_wid!==null?' on':'')+'" onclick="toggleMe()">'+(_wid!==null?'Arrêter le suivi':'Me localiser')+'</button><div class="mattr">© OpenStreetMap</div>';
 }
 function mapInner(){
+  if(!S.park||!S.park.lat) return "";
   if(_tilesOK===false) return planInner();
   if(_tilesOK===null){ clearTimeout(_tileTimer); _tileTimer=setTimeout(function(){ if(_tilesOK===null){ _tilesOK=false; paintMap(); } },4500); }
   return tileInner();
@@ -2781,7 +2782,7 @@ function tileOk(){ if(_tilesOK===null){ _tilesOK=true; clearTimeout(_tileTimer);
 function tileFail(){ if(_tilesOK===null){ var t=document.querySelectorAll("#mapbox .mtiles img"), ok=false; Array.prototype.forEach.call(t,function(i){ if(i.complete&&i.naturalWidth>0) ok=true; }); if(!ok){ _tilesOK=false; clearTimeout(_tileTimer); paintMap(); } } }
 function mapZoom(d){ mapZ=Math.max(10,Math.min(19,(mapZ||mapAutoZ())+d)); paintMap(); }
 function mapRetry(){ _tilesOK=null; mapZ=null; paintMap(); }
-function paintMap(){ var el=document.getElementById("mapbox"); if(!el) return; var keep=el.querySelector(".mtiles")&&_tilesOK===true&&window._me&&false; el.innerHTML=mapInner(); var sc=el.querySelector(".mscale"); if(sc){ var s=el.clientWidth/MW; sc.style.transform="scale("+s+")"; } el.style.height=(el.clientWidth*MH/MW)+"px"; }
+function paintMap(){ var el=document.getElementById("mapbox"); if(!el||!S.park||!S.park.lat) return; var keep=el.querySelector(".mtiles")&&_tilesOK===true&&window._me&&false; el.innerHTML=mapInner(); var sc=el.querySelector(".mscale"); if(sc){ var s=el.clientWidth/MW; sc.style.transform="scale("+s+")"; } el.style.height=(el.clientWidth*MH/MW)+"px"; }
 function planInner(){
   var P=S.park, me=window._me||null, W=360, Hh=224, cx=180, cy=108, R=82, dx=0, dy=0, dist=null;
   if(me){ dx=(me.lon-P.lon)*Math.cos(P.lat*Math.PI/180)*111320; dy=(me.lat-P.lat)*110540; dist=Math.hypot(dx,dy); }
@@ -2814,6 +2815,80 @@ function toggleMe(){
     function(){ toast("Localisation refusée ou bloquée",true); stopWatch(); paintMap(); },{enableHighAccuracy:true,maximumAge:2000,timeout:20000});
   paintMap();
 }
+/* ---------- Stationnement réel ---------- */
+function imgShrink(file,max,q){
+  return new Promise(function(res,rej){ var fr=new FileReader(); fr.onerror=function(){ rej(new Error("lecture")); };
+    fr.onload=function(){ var im=new Image(); im.onerror=function(){ rej(new Error("image")); }; im.onload=function(){ var s=Math.min(1,max/Math.max(im.width,im.height)), cv=document.createElement("canvas"); cv.width=Math.round(im.width*s); cv.height=Math.round(im.height*s); cv.getContext("2d").drawImage(im,0,0,cv.width,cv.height); res(cv.toDataURL("image/jpeg",q)); }; im.src=fr.result; };
+    fr.readAsDataURL(file); });
+}
+function parkAddrTxt(a){
+  if(!a) return ""; var r=a.road||a.pedestrian||a.footway||a.path||a.residential||a.parking||"", c=a.city||a.town||a.village||a.municipality||"";
+  var l1=((a.house_number?a.house_number+" ":"")+r).trim(), l2=((a.postcode?a.postcode+" ":"")+c).trim(); return [l1,l2].filter(Boolean).join(", ");
+}
+function parkGeocode(){
+  var P=S.park; if(!P||!P.lat||P.addr) return;
+  var key=P.ts, url="https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=18&addressdetails=1&accept-language=fr&lat="+P.lat+"&lon="+P.lon;
+  rtFetch(url,8000).then(function(j){
+    if(!S.park||S.park.ts!==key) return; var a=parkAddrTxt(j&&j.address)||(j&&j.display_name?String(j.display_name).split(",").slice(0,3).join(","):""); if(!a) return;
+    S.park.addr=a; var he=(S.parkHist||[])[0]; if(he&&he.ts===key) he.addr=a; save(); var e=document.getElementById("pkinfo"); if(e) e.innerHTML=parkInfoHTML(); else render();
+  }).catch(function(){});
+}
+function savePark(pos,opts){
+  opts=opts||{}; var c=pos.coords, P=S.park||{}, hd=c.heading;
+  hd=(typeof hd==="number"&&isFinite(hd)&&(c.speed==null||c.speed>0.5))?Math.round(hd):(P.hdgFix?P.hdg:(opts.hdg!=null?opts.hdg:null));
+  var ts=opts.ts||nowLocal();
+  S.park={lat:c.latitude,lon:c.longitude,acc:Math.round(c.accuracy||0),alt:(typeof c.altitude==="number"&&isFinite(c.altitude))?Math.round(c.altitude):null,hdg:hd,hdgFix:false,note:P.note&&!opts.auto?P.note:"",addr:"",ts:ts,until:null,img:null,auto:!!opts.auto};
+  if(!S.parkHist) S.parkHist=[]; S.parkHist.unshift({ts:ts,lat:c.latitude,lon:c.longitude,acc:S.park.acc,addr:"",note:S.park.note,auto:!!opts.auto}); if(S.parkHist.length>20) S.parkHist.length=20;
+  mapZ=null; _tilesOK=null; save(); render(); toast("Position enregistrée"+(S.park.acc?" (± "+S.park.acc+" m)":"")); parkGeocode();
+}
+function parkHere(opts){
+  if(!navigator.geolocation){ toast("Localisation indisponible",true); sheetPark(); return; }
+  toast("Affinage de la position…",true);
+  var best=null, id=null, done=false, t0=Date.now(), to=null;
+  var finish=function(){ if(done) return; done=true; try{ if(id!==null) navigator.geolocation.clearWatch(id); }catch(e){} clearTimeout(to); if(!best){ toast("Localisation refusée ou bloquée",true); sheetPark(); return; } savePark(best,opts); };
+  var one=function(){ navigator.geolocation.getCurrentPosition(function(p_){ best=p_; finish(); },function(){ finish(); },{enableHighAccuracy:true,timeout:10000,maximumAge:0}); };
+  try{ id=navigator.geolocation.watchPosition(function(pos){ if(!best||pos.coords.accuracy<best.coords.accuracy) best=pos; if(best.coords.accuracy<=8||(Date.now()-t0>2500&&best.coords.accuracy<=20)||Date.now()-t0>7000) finish(); },function(){ if(done) return; if(!best){ clearTimeout(to); try{ if(id!==null) navigator.geolocation.clearWatch(id); }catch(e){} id=null; one(); } else finish(); },{enableHighAccuracy:true,maximumAge:0,timeout:12000}); }catch(e){ one(); return; }
+  to=setTimeout(finish,8500); setTimeout(function(){ if(done) return; if(!best) one(); else if(best.coords.accuracy<=20) finish(); },3000);
+}
+/* détection automatique : l'app doit rester ouverte (un navigateur ne suit pas la position en arrière-plan) */
+var PA={moveSince:0,drive:false,stillSince:0,still:null,last:null,cool:0}, _pwid=null;
+function parkSpeed(a,b){ var dt=(b.timestamp-a.timestamp)/1000; if(!(dt>0.5)) return null; return hav(a.coords.latitude,a.coords.longitude,b.coords.latitude,b.coords.longitude)*1000/dt; }
+function parkAutoFeed(pos,now){
+  now=now||Date.now(); var c=pos.coords, sp=(typeof c.speed==="number"&&isFinite(c.speed)&&c.speed>=0)?c.speed:(PA.last?parkSpeed(PA.last,pos):null);
+  if(sp!==null){
+    if(sp>=4){ if(!PA.moveSince) PA.moveSince=now; if(now-PA.moveSince>=25000) PA.drive=true; PA.stillSince=0; }
+    else if(sp<1){ PA.moveSince=0; if(PA.drive){ if(!PA.stillSince){ PA.stillSince=now; PA.still=pos; } else if(now-PA.stillSince>=120000&&hav(PA.still.coords.latitude,PA.still.coords.longitude,c.latitude,c.longitude)*1000<40){ PA.drive=false; PA.stillSince=0; parkAutoPrompt(PA.still,now); } } }
+    else { PA.stillSince=0; PA.moveSince=0; }
+  }
+  PA.last=pos;
+}
+function parkAutoPrompt(pos,now){
+  now=now||Date.now(); if(now-PA.cool<10*60*1000) return; PA.cool=now; try{ if(navigator.vibrate) navigator.vibrate([120,80,120]); }catch(e){}
+  ask("Tu sembles t’être garé (arrêt de plus de 2 minutes après un trajet). Enregistrer cet endroit comme emplacement de la voiture ?",function(){ savePark(pos,{auto:true}); },"Oui, enregistrer","Voiture garée ?");
+}
+function parkAutoStart(){
+  if(_pwid!==null||!navigator.geolocation) return;
+  try{ _pwid=navigator.geolocation.watchPosition(function(pos){ parkAutoFeed(pos); },function(){ parkAutoStop(); S.parkAuto=false; save(); toast("Localisation refusée : détection désactivée",true); var e=document.getElementById("pauto"); if(e) e.checked=false; },{enableHighAccuracy:true,maximumAge:5000,timeout:30000}); }catch(e){}
+}
+function parkAutoStop(){ if(_pwid!==null&&navigator.geolocation){ try{ navigator.geolocation.clearWatch(_pwid); }catch(e){} } _pwid=null; PA.moveSince=0; PA.drive=false; PA.stillSince=0; PA.last=null; }
+function parkAutoToggle(on){ S.parkAuto=!!on; save(); if(on){ parkAutoStart(); toast("Détection activée : garde l’app ouverte pendant tes trajets"); } else { parkAutoStop(); toast("Détection désactivée"); } }
+document.addEventListener("visibilitychange",function(){ if(S.parkAuto){ if(document.hidden) parkAutoStop(); else parkAutoStart(); } });
+setTimeout(function(){ if(S.parkAuto&&!document.hidden) parkAutoStart(); },4000);
+function parkPhoto(el){ var f=el.files&&el.files[0]; if(!f) return; el.value=""; imgShrink(f,900,0.62).then(function(d){ if(!S.park) S.park={note:"",ts:nowLocal()}; S.park.img=d; save(); toast("Photo enregistrée"); render(); },function(){ toast("Photo illisible",true); }); }
+function parkShare(){
+  var P=S.park; if(!P||!P.lat){ toast("Enregistre d’abord une position",true); return; }
+  var url="https://maps.apple.com/?ll="+P.lat+","+P.lon+"&q="+encodeURIComponent("Ma voiture"), txt=(P.note||P.addr||"Ma voiture")+" — garée "+agoTxt(P.ts);
+  if(navigator.share){ navigator.share({title:"Ma voiture",text:txt,url:url}).catch(function(){}); return; }
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt+"\n"+url).then(function(){ toast("Lien copié"); },function(){ toast("Copie impossible",true); }); } else toast("Partage indisponible ici",true);
+}
+function parkDur(i,list){ var a=+new Date(list[i].ts), b=i>0?+new Date(list[i-1].ts):Date.now(), m=Math.max(0,Math.round((b-a)/6e4)); return m>=60*24?Math.round(m/1440)+" j":(m>=60?Math.floor(m/60)+" h "+String(m%60).padStart(2,"0"):m+" min"); }
+function parkHistHTML(){
+  var L=S.parkHist||[]; if(L.length<2) return "";
+  return '<details class="hmore"><summary>Derniers stationnements ('+L.length+')</summary><div style="margin-top:6px">'+L.slice(0,8).map(function(e,i){
+    var link="https://maps.apple.com/?ll="+e.lat+","+e.lon+"&q="+encodeURIComponent("Stationnement");
+    return '<div class="lgr"><span style="min-width:0"><b style="font-size:14px">'+esc(e.note||e.addr||"Position enregistrée")+'</b><br><small class="mut">'+new Date(e.ts).toLocaleString("fr-FR",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+' · '+(i===0?"depuis ":"pendant ")+parkDur(i,L)+(e.auto?" · auto":"")+'</small></span><a class="chp" href="'+link+'" target="_blank" rel="noopener">Plans</a></div>';
+  }).join("")+'</div></details>';
+}
 function parkTimer(){
   var P=S.park; if(!P||!P.until) return ""; var ms=+new Date(P.until)-Date.now(), m=Math.round(Math.abs(ms)/6e4);
   var txt=m>=60?Math.floor(m/60)+" h "+String(m%60).padStart(2,"0"):m+" min";
@@ -2821,7 +2896,8 @@ function parkTimer(){
 }
 function parkInfoHTML(){
   var P=S.park; if(!P) return "";
-  return '<b style="font-size:17px">'+(P.note?esc(P.note):"Position enregistrée")+'</b><div class="mut" style="font-size:13px;margin-top:2px">Garée '+agoTxt(P.ts)+(P.lat?" · "+P.lat.toFixed(5)+", "+P.lon.toFixed(5):"")+(P.hdg!=null?" · orientée "+dirTxt(P.hdg):"")+'</div>'+(P.until?'<div style="margin-top:8px">'+parkTimer()+'</div>':'');
+  var ttl=P.note||P.addr||"Position enregistrée", sub=(P.note&&P.addr?'<div class="mut" style="font-size:13px;margin-top:2px">'+esc(P.addr)+'</div>':"");
+  return '<b style="font-size:17px">'+esc(ttl)+'</b>'+sub+'<div class="mut" style="font-size:13px;margin-top:2px">Garée '+agoTxt(P.ts)+(P.lat?" · ± "+(P.acc||"?")+" m":"")+(P.hdg!=null?" · orientée "+dirTxt(P.hdg):"")+(P.alt!=null?" · alt. "+P.alt+" m":"")+(P.auto?" · détectée automatiquement":"")+'</div>'+(P.lat&&!P.addr?'<div class="mut" style="font-size:12px;margin-top:2px">'+P.lat.toFixed(5)+', '+P.lon.toFixed(5)+'</div>':'')+(P.until?'<div style="margin-top:8px">'+parkTimer()+'</div>':'');
 }
 function parkCard(){
   var P=S.park, has=P&&(P.lat||P.note);
@@ -2829,21 +2905,16 @@ function parkCard(){
   if(has){
     var link=P.lat?"https://maps.apple.com/?daddr="+P.lat+","+P.lon+"&dirflg=w":"https://maps.apple.com/?q="+encodeURIComponent(P.note);
     h+=(P.lat?'<div class="mapbox" id="mapbox">'+mapInner()+'</div>':'<div class="pstage">'+carTopSVG(78,P.hdg)+'<b class="mpb big">P</b></div>')+
+      (P.img?'<img class="scimg" src="'+P.img+'" alt="Photo de l’emplacement" style="max-height:170px;margin-top:10px">':'')+
       '<div id="pkinfo" style="margin-top:12px">'+parkInfoHTML()+'</div>'+
-      '<div class="row" style="margin-top:14px;gap:8px"><a class="btn p s" style="flex:1.3" href="'+link+'" target="_blank" rel="noopener">'+FI.pin+' Itinéraire à pied</a><button class="btn s" style="flex:1" onclick="parkHere()">Garée ici</button><button class="btn s" onclick="sheetPark()">Modifier</button></div>';
+      '<div class="row" style="margin-top:14px;gap:8px"><a class="btn p s" style="flex:1.3" href="'+link+'" target="_blank" rel="noopener">'+FI.pin+' Itinéraire à pied</a><button class="btn s" style="flex:1" onclick="parkHere()">Garée ici</button></div>'+
+      '<div class="row" style="margin-top:8px;gap:8px"><button class="btn s" style="flex:1" onclick="sheetPark()">Modifier</button><button class="btn s" style="flex:1" onclick="parkShare()">Partager</button><label class="btn s" style="flex:1;cursor:pointer" for="pk_cam">'+FI.cam+' Photo</label><input id="pk_cam" type="file" accept="image/*" capture="environment" hidden onchange="parkPhoto(this)"></div>';
   } else {
-    h+='<div class="pstage">'+carTopSVG(78,0)+'<b class="mpb big">P</b></div><div class="mut" style="margin-top:12px;line-height:1.45">Enregistre l’endroit où tu as garé la voiture : une carte te ramène à elle, avec la distance à pied.</div>'+
+    h+='<div class="pstage">'+carTopSVG(78,0)+'<b class="mpb big">P</b></div><div class="mut" style="margin-top:12px;line-height:1.45">Enregistre l’endroit exact où tu as garé la voiture : position GPS affinée, adresse, photo et carte pour la retrouver.</div>'+
       '<div class="row" style="margin-top:14px;gap:8px"><button class="btn p s" style="flex:1.3" onclick="parkHere()">Je me gare ici</button><button class="btn s" style="flex:1" onclick="sheetPark()">Saisir un repère</button></div>';
   }
-  return h+'</div>';
-}
-function parkHere(){
-  if(!navigator.geolocation){ toast("Localisation indisponible",true); sheetPark(); return; }
-  toast("Recherche de la position…",true);
-  navigator.geolocation.getCurrentPosition(function(pos){
-    var P=S.park||{}, hd=pos.coords.heading; hd=(typeof hd==="number"&&isFinite(hd)&&(pos.coords.speed==null||pos.coords.speed>0.5))?Math.round(hd):(P.hdgFix?P.hdg:null);
-    S.park={lat:pos.coords.latitude,lon:pos.coords.longitude,acc:Math.round(pos.coords.accuracy||0),hdg:hd,hdgFix:false,note:P.note||"",ts:nowLocal()}; mapZ=null; save(); render(); toast("Position enregistrée");
-  },function(){ toast("Localisation refusée ou bloquée",true); sheetPark(); },{enableHighAccuracy:true,timeout:10000,maximumAge:0});
+  h+='<label class="row" style="color:var(--tx);font-size:14px;margin-top:14px;align-items:flex-start;gap:10px"><input id="pauto" type="checkbox" '+(S.parkAuto?"checked":"")+' onchange="parkAutoToggle(this.checked)" style="margin-top:3px"><span style="flex:1;min-width:0">Détecter automatiquement le stationnement<small class="mut" style="display:block;font-size:12px;line-height:1.4;margin-top:2px">Propose d’enregistrer l’endroit quand tu t’arrêtes plus de 2 minutes après un trajet. Fonctionne seulement quand l’app est ouverte à l’écran.</small></span></label>';
+  return h+parkHistHTML()+'</div>';
 }
 function sheetPark(){
   var P=S.park||{}, dirs=[["N",0],["NE",45],["E",90],["SE",135],["S",180],["SO",225],["O",270],["NO",315]];
@@ -2855,12 +2926,12 @@ function sheetPark(){
       var t=v("p_note").trim(); if(!t&&!P.lat) return false;
       var un=v("p_until"), until=null; if(un){ var d=new Date(), a=un.split(":"); d.setHours(+a[0],+a[1],0,0); if(d<new Date(Date.now()-6e4)) d.setDate(d.getDate()+1); until=d.toISOString(); }
       var sel=document.querySelector("#p_dirs button.on"), hd=sel?+sel.getAttribute("data-h"):P.hdg, fix=sel?true:!!P.hdgFix;
-      S.park={lat:P.lat||null,lon:P.lon||null,acc:P.acc||0,hdg:(hd===undefined?null:hd),hdgFix:fix,note:t,ts:P.ts||nowLocal(),until:until}; mapZ=null; save(); render();
+      S.park={lat:P.lat||null,lon:P.lon||null,acc:P.acc||0,alt:P.alt!=null?P.alt:null,hdg:(hd===undefined?null:hd),hdgFix:fix,note:t,addr:P.addr||"",ts:P.ts||nowLocal(),until:until,img:P.img||null,auto:!!P.auto}; var he=(S.parkHist||[])[0]; if(he&&he.ts===S.park.ts) he.note=t; mapZ=null; save(); render();
     });
 }
 function parkDir(d){ Array.prototype.forEach.call(document.querySelectorAll("#p_dirs button"),function(b){ b.classList.toggle("on",+b.getAttribute("data-h")===d&&!b.classList.contains("on")); }); }
 setInterval(function(){ var e=document.getElementById("pkinfo"); if(e&&S.park) e.innerHTML=parkInfoHTML(); },30000);
-function parkClear(){ ask("Effacer la position de la voiture ?",function(){ S.park=null; _tilesOK=null; save(); render(); toast("Position effacée",true); },"Effacer"); }
+function parkClear(){ ask("Effacer la position de la voiture ? Elle reste dans l’historique des stationnements.",function(){ S.park=null; _tilesOK=null; save(); render(); toast("Position effacée",true); },"Effacer"); }
 var KI={
   km:'<svg viewBox="0 0 24 24"><path d="M4 16a8 8 0 1 1 16 0"/><path d="M12 16l3.6-4.6"/></svg>',
   conso:'<svg viewBox="0 0 24 24"><path d="M12 3.5s6 6.2 6 10.5a6 6 0 0 1-12 0c0-4.3 6-10.5 6-10.5z"/></svg>',
@@ -3456,7 +3527,7 @@ function render(){
   if(!nav.querySelector(".ind")) nav.innerHTML='<div class="nin"><div class="ind"></div>'+TABS.map(function(t){return '<button onclick="go(\''+t[0]+'\')"><span>'+t[1]+'</span>'+t[2]+'</button>';}).join("")+'</div>';
   nav.style.setProperty("--i",idx);
   Array.prototype.forEach.call(nav.querySelectorAll("button"),function(b,k){ b.classList.toggle("on",k===idx); });
-  paintEnergy(true); rtPaint(); histPaint(); consPaint(); fpPaint();
+  paintEnergy(true); rtPaint(); histPaint(); consPaint(); fpPaint(); paintMap();
   if(cur[0]!=="commandes") stopWatch();
   $("#ttl").textContent=(cur[0]==="accueil"?S.v.name:({conso:"Consommation",entretien:"Entretien",batterie:"Batterie",commandes:"Véhicule",reglages:"Réglages"})[cur[0]]);
   $("#sub").innerHTML='<i class="lg mini"></i>'+esc((S.v.plate?S.v.plate+" · ":"")+"Hybride rechargeable"+(S.v.reg?" · "+new Date(S.v.reg).getFullYear():""));
