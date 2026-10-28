@@ -992,6 +992,7 @@ function vReglages(){
     arow("Réappliquer les intervalles MG EHS","reapply()","Remet les intervalles et coûts du profil")+
     arow("Supprimer pleins et relevés","clearLogs()","",true)+
     arow("Tout réinitialiser","resetAll()","",true)+'</div>';
+  h+='<div class="sec">Localisation</div><div class="card lst">'+arow("Autoriser la localisation","sheetGeo()",'<span id="geost">'+geoLabel(_geoSt)+'</span>')+'</div>';
   h+='<div class="sec">À propos</div><div class="card lst">'+lrow("Version","2.0")+lrow("Créé par","Lahbib")+lrow("Connexion à la voiture","Aucune")+'</div>'+
     '<div class="foot">Les données restent sur cet appareil. Les commandes de l’onglet Véhicule sont des consignes à lancer depuis MG iSMART.</div>';
   return h;
@@ -2443,7 +2444,7 @@ function rtGeo(i){
   navigator.geolocation.getCurrentPosition(function(pos){
     var pt=rt.pts[i]; pt.lat=pos.coords.latitude; pt.lon=pos.coords.longitude; if(!pt.label) pt.label="Position actuelle";
     var k=rtAutoLegs(); rtRender(); toast(k?"Position enregistrée : distance calculée":"Position enregistrée");
-  },function(){ toast("Localisation refusée ou bloquée",true); },{enableHighAccuracy:true,timeout:12000});
+  },function(x){ geoFail(x); },{enableHighAccuracy:true,timeout:12000});
 }
 function rtFetch(url,ms){
   return new Promise(function(res,rej){ var c=new AbortController(), t=setTimeout(function(){ c.abort(); rej(new Error("delai")); },ms||6500);
@@ -2812,7 +2813,7 @@ function toggleMe(){
   if(_wid!==null){ stopWatch(); paintMap(); return; }
   if(!navigator.geolocation){ toast("Localisation indisponible",true); return; }
   _wid=navigator.geolocation.watchPosition(function(pos){ window._me={lat:pos.coords.latitude,lon:pos.coords.longitude,acc:pos.coords.accuracy}; paintMap(); },
-    function(){ toast("Localisation refusée ou bloquée",true); stopWatch(); paintMap(); },{enableHighAccuracy:true,maximumAge:2000,timeout:20000});
+    function(x){ stopWatch(); paintMap(); geoFail(x); },{enableHighAccuracy:true,maximumAge:2000,timeout:20000});
   paintMap();
 }
 /* ---------- Stationnement réel ---------- */
@@ -2833,21 +2834,101 @@ function parkGeocode(){
     S.park.addr=a; var he=(S.parkHist||[])[0]; if(he&&he.ts===key) he.addr=a; save(); var e=document.getElementById("pkinfo"); if(e) e.innerHTML=parkInfoHTML(); else render();
   }).catch(function(){});
 }
-function savePark(pos,opts){
-  opts=opts||{}; var c=pos.coords, P=S.park||{}, hd=c.heading;
-  hd=(typeof hd==="number"&&isFinite(hd)&&(c.speed==null||c.speed>0.5))?Math.round(hd):(P.hdgFix?P.hdg:(opts.hdg!=null?opts.hdg:null));
-  var ts=opts.ts||nowLocal();
-  S.park={lat:c.latitude,lon:c.longitude,acc:Math.round(c.accuracy||0),alt:(typeof c.altitude==="number"&&isFinite(c.altitude))?Math.round(c.altitude):null,hdg:hd,hdgFix:false,note:P.note&&!opts.auto?P.note:"",addr:"",ts:ts,until:null,img:null,auto:!!opts.auto};
-  if(!S.parkHist) S.parkHist=[]; S.parkHist.unshift({ts:ts,lat:c.latitude,lon:c.longitude,acc:S.park.acc,addr:"",note:S.park.note,auto:!!opts.auto}); if(S.parkHist.length>20) S.parkHist.length=20;
-  mapZ=null; _tilesOK=null; save(); render(); toast("Position enregistrée"+(S.park.acc?" (± "+S.park.acc+" m)":"")); parkGeocode();
+/* ---------- Trajet GPS -> kilométrage ; emplacement sans doublon ---------- */
+var TRIP={km:0,last:null,gap:false};
+function tripFeed(pos){
+  var c=pos.coords; if(!(c.accuracy<=40)) return; var cur={lat:c.latitude,lon:c.longitude,t:pos.timestamp||Date.now()}, L=TRIP.last;
+  if(!L){ TRIP.last=cur; return; }
+  var d=hav(L.lat,L.lon,cur.lat,cur.lon)*1000, dt=(cur.t-L.t)/1000; if(!(dt>0)) return;
+  if(dt>90){ if(d>=200&&d/dt<45){ TRIP.km+=d*1.3/1000; TRIP.gap=true; } TRIP.last=cur; return; }   /* suivi interrompu : estimation de la route */
+  var sp=(typeof c.speed==="number"&&isFinite(c.speed)&&c.speed>=0)?c.speed:d/dt;
+  if(d>=Math.max(8,c.accuracy*0.6)&&sp>=1.5&&sp<75){ TRIP.km+=d/1000; TRIP.last=cur; }
 }
+function tripReset(){ TRIP.km=0; TRIP.last=null; TRIP.gap=false; }
+function parkSame(P,c){ if(!P||!P.lat) return false; if(TRIP.km>=0.3) return false; var d=hav(P.lat,P.lon,c.latitude,c.longitude)*1000; return d<=Math.max(25,(P.acc||0)*1.2,(c.accuracy||0)*1.2); }
+function parkKmCalc(P,c){
+  var straight=(P&&P.lat)?hav(P.lat,P.lon,c.latitude,c.longitude):0, km=0, method="";
+  if(TRIP.km>=0.3){ km=TRIP.km; method=TRIP.gap?"tracé GPS partiel (suivi interrompu)":"tracé GPS du trajet"; if(TRIP.gap) km=Math.max(km,straight*1.3); }
+  else if(straight>=0.3){ km=straight*1.3; method="distance à vol d’oiseau × 1,3 (active la détection pour un tracé précis)"; }
+  var done=(P&&P.odoRef!=null)?Math.max(0,(S.v.odo||0)-P.odoRef):0;
+  return {km:Math.max(0,km-done),raw:km,done:done,method:method};
+}
+function kmApply(km,note){ var add=Math.round(km); if(!(add>=1)) return; S.v.odo=(S.v.odo||0)+add; logOdo(S.v.odo); if(S.park) S.park.odoRef=S.v.odo; save(); render(); toast("Compteur +"+n(add,0)+" km → "+n(S.v.odo,0)+" km"); }
+function kmPrompt(r){
+  if(!(r.km>=0.5)) return;
+  if(S.kmAuto){ kmApply(r.km); return; }
+  sheet("Mettre à jour le kilométrage",
+    '<div style="line-height:1.5;font-size:15px">Trajet depuis le dernier stationnement : <b>'+n2(r.km,1)+' km</b><div class="mut" style="font-size:13px;margin-top:2px">'+esc(r.method)+(r.done>0?' · déjà compté dans le compteur : '+n(r.done,0)+' km':'')+'</div></div>'+
+    '<label>Kilomètres à ajouter</label><input id="km_add" type="number" inputmode="decimal" step="1" value="'+Math.round(r.km)+'">'+
+    '<div class="mut" style="font-size:13px;margin-top:6px">Compteur actuel : '+n(S.v.odo||0,0)+' km</div>'+
+    '<label class="row" style="color:var(--tx);font-size:14px;margin-top:12px;gap:10px"><input id="km_auto" type="checkbox"> Ajouter automatiquement la prochaine fois</label>',
+    function(){ var a=parseFloat(v("km_add")); if(!(a>=0)) return false; if(document.getElementById("km_auto").checked){ S.kmAuto=true; var c=document.getElementById("kauto"); if(c) c.checked=true; } if(a>=1) kmApply(a); else { if(S.park) S.park.odoRef=S.v.odo; save(); } return true; },"Ajouter au compteur");
+}
+function parkHistClean(){
+  var L=S.parkHist; if(!L||!L.length) return; var out=[];
+  L.forEach(function(e){ var k=out[out.length-1]; if(k&&(k.ts===e.ts||(Math.abs(+new Date(k.ts)-+new Date(e.ts))<10*60*1000&&hav(k.lat,k.lon,e.lat,e.lon)*1000<25))){ if(!k.note&&e.note) k.note=e.note; if(!k.addr&&e.addr) k.addr=e.addr; return; } out.push(e); });
+  if(out.length!==L.length){ S.parkHist=out; save(); }
+}
+setTimeout(parkHistClean,800);
+function savePark(pos,opts){
+  opts=opts||{}; var c=pos.coords, P=S.park, now=nowLocal();
+  if(parkSame(P,c)){      /* même endroit : on affine la position, sans doublon ni nouveau kilométrage */
+    if((c.accuracy||999)<(P.acc||999)){ P.lat=c.latitude; P.lon=c.longitude; P.acc=Math.round(c.accuracy); }
+    if(typeof c.altitude==="number"&&isFinite(c.altitude)) P.alt=Math.round(c.altitude);
+    P.chk=now; var he0=(S.parkHist||[])[0]; if(he0&&he0.ts===P.ts){ he0.lat=P.lat; he0.lon=P.lon; he0.acc=P.acc; }
+    tripReset(); save(); render(); toast("Même emplacement : position mise à jour (± "+(P.acc||"?")+" m)"); return;
+  }
+  var kmr=parkKmCalc(P,c), hd=c.heading;
+  hd=(typeof hd==="number"&&isFinite(hd)&&(c.speed==null||c.speed>0.5))?Math.round(hd):(P&&P.hdgFix?P.hdg:(opts.hdg!=null?opts.hdg:null));
+  S.park={lat:c.latitude,lon:c.longitude,acc:Math.round(c.accuracy||0),alt:(typeof c.altitude==="number"&&isFinite(c.altitude))?Math.round(c.altitude):null,hdg:hd,hdgFix:false,note:(P&&P.note&&!opts.auto)?P.note:"",addr:"",ts:now,chk:now,until:null,img:null,auto:!!opts.auto,odoRef:S.v.odo||0};
+  if(!S.parkHist) S.parkHist=[]; var h0=S.parkHist[0], ent={ts:now,lat:c.latitude,lon:c.longitude,acc:S.park.acc,addr:"",note:S.park.note,auto:!!opts.auto};
+  if(h0&&h0.ts===now) S.parkHist[0]=ent; else S.parkHist.unshift(ent); if(S.parkHist.length>20) S.parkHist.length=20;
+  tripReset(); mapZ=null; _tilesOK=null; save(); render(); toast("Position enregistrée"+(S.park.acc?" (± "+S.park.acc+" m)":"")); parkGeocode();
+  if(P&&P.lat) setTimeout(function(){ kmPrompt(kmr); },700);
+}
+/* ---------- Autorisation de la localisation ---------- */
+var _geoSt="unknown";
+function geoLabel(s){ return {granted:"Autorisée",prompt:"À autoriser",denied:"Refusée",blocked:"Bloquée dans cette app",unknown:"À vérifier"}[s]||"À vérifier"; }
+function geoCheck(){
+  var q=(navigator.permissions&&navigator.permissions.query)?navigator.permissions.query({name:"geolocation"}).then(function(r){ _geoSt=r.state; r.onchange=function(){ _geoSt=r.state; geoPaint(); }; return _geoSt; },function(){ return _geoSt; }):Promise.resolve(_geoSt);
+  return q.then(function(s){ geoPaint(); return s; });
+}
+function geoClassify(e){ var m=((e&&e.message)||"").toLowerCase(); if(e&&e.code===1) return /policy|disabled|not allowed|secure/.test(m)?"blocked":"denied"; return null; }
+function geoRequest(cb){
+  if(!navigator.geolocation){ _geoSt="blocked"; geoPaint(); cb&&cb({code:0,message:"unavailable"}); return; }
+  navigator.geolocation.getCurrentPosition(function(p_){ _geoSt="granted"; geoPaint(); cb&&cb(null,p_); },function(e){ var c=geoClassify(e); if(c) _geoSt=c; geoPaint(); cb&&cb(e||{code:2}); },{enableHighAccuracy:true,timeout:12000,maximumAge:0});
+}
+function geoPaint(){
+  var e=document.getElementById("geost"); if(e) e.textContent=geoLabel(_geoSt);
+  var b=document.getElementById("gp_body"); if(b) b.innerHTML=geoBody();
+  var n_=document.getElementById("geobn"); if(n_) n_.style.display=(_geoSt==="granted"||_geoSt==="unknown")?"none":"";
+}
+function geoBody(){
+  var s=_geoSt, cls=s==="granted"?"ok":(s==="prompt"||s==="unknown"?"warn":"bad");
+  var h_='<div class="rtv '+cls+'" style="margin-top:0"><div><b>Localisation : '+geoLabel(s)+'</b></div></div>'+
+   '<div class="mut" style="line-height:1.5;margin-top:12px;font-size:14px">Elle sert à enregistrer l’emplacement de la voiture, calculer la distance à pied, mesurer un trajet et trouver le prix du carburant autour de toi. Elle n’est demandée que lorsque tu touches un bouton concerné, et ta position reste sur cet appareil.</div>';
+  if(s==="blocked") h_+='<div class="ivw" style="margin-top:12px"><div><b>Cette fenêtre ne peut pas demander la localisation.</b><br>L’application Claude bloque la localisation pour les pages intégrées. Ouvre l’app installée sur ton écran d’accueil (version hébergée) : la demande d’autorisation s’y affichera normalement.</div></div>';
+  else if(s==="denied") h_+='<div class="ivw" style="margin-top:12px"><div><b>Tu as refusé la localisation.</b> Pour la réactiver sur iPhone :<br>1. Ouvre <b>Réglages › Confidentialité et sécurité › Service de localisation</b> et vérifie qu’il est activé.<br>2. Choisis <b>Safari (sites web)</b> ou l’app installée, puis « Lors de l’utilisation de l’app ».<br>3. Reviens ici et touche « Autoriser ».</div></div>';
+  else if(s==="granted") h_+='<div class="mut" style="margin-top:12px;font-size:14px">C’est bon : tu peux utiliser « Je me gare ici », « Me localiser » et le prix automatique.</div>';
+  else h_+='<div class="mut" style="margin-top:12px;font-size:14px">Touche « Autoriser » : ton iPhone affichera une fenêtre. Choisis <b>Autoriser</b> (ou « Lors de l’utilisation de l’app »).</div>';
+  return h_+'<div class="mut" id="geores" style="margin-top:10px;font-size:13px"></div>';
+}
+function sheetGeo(){
+  sheet("Autoriser la localisation",'<div id="gp_body">'+geoBody()+'</div>',function(){
+    var r=document.getElementById("geores"); if(r) r.innerHTML='<span class="spin"></span>Demande en cours…';
+    geoRequest(function(e,p_){ var r2=document.getElementById("geores"); if(!r2) return; if(!e){ r2.innerHTML='<b style="color:var(--ok)">Localisation active</b> · précision ± '+Math.round(p_.coords.accuracy)+' m'; toast("Localisation autorisée"); render(); } else r2.textContent=(e.code===1?"Autorisation refusée ou bloquée.":"Position introuvable : va à l’extérieur ou réessaie.")+" Suis les consignes ci-dessus."; });
+    return false; },"Autoriser");
+  geoCheck();
+}
+function geoFail(e){ var c=geoClassify(e); if(c) _geoSt=c; else if(_geoSt==="unknown") _geoSt="prompt"; geoPaint(); sheetGeo(); }
+setTimeout(geoCheck,1500);
 function parkHere(opts){
   if(!navigator.geolocation){ toast("Localisation indisponible",true); sheetPark(); return; }
   toast("Affinage de la position…",true);
-  var best=null, id=null, done=false, t0=Date.now(), to=null;
-  var finish=function(){ if(done) return; done=true; try{ if(id!==null) navigator.geolocation.clearWatch(id); }catch(e){} clearTimeout(to); if(!best){ toast("Localisation refusée ou bloquée",true); sheetPark(); return; } savePark(best,opts); };
-  var one=function(){ navigator.geolocation.getCurrentPosition(function(p_){ best=p_; finish(); },function(){ finish(); },{enableHighAccuracy:true,timeout:10000,maximumAge:0}); };
-  try{ id=navigator.geolocation.watchPosition(function(pos){ if(!best||pos.coords.accuracy<best.coords.accuracy) best=pos; if(best.coords.accuracy<=8||(Date.now()-t0>2500&&best.coords.accuracy<=20)||Date.now()-t0>7000) finish(); },function(){ if(done) return; if(!best){ clearTimeout(to); try{ if(id!==null) navigator.geolocation.clearWatch(id); }catch(e){} id=null; one(); } else finish(); },{enableHighAccuracy:true,maximumAge:0,timeout:12000}); }catch(e){ one(); return; }
+  var best=null, id=null, done=false, t0=Date.now(), to=null, lastErr=null;
+  var finish=function(){ if(done) return; done=true; try{ if(id!==null) navigator.geolocation.clearWatch(id); }catch(e){} clearTimeout(to); if(!best){ geoFail(lastErr); return; } savePark(best,opts); };
+  var one=function(){ navigator.geolocation.getCurrentPosition(function(p_){ best=p_; finish(); },function(x){ lastErr=x; finish(); },{enableHighAccuracy:true,timeout:10000,maximumAge:0}); };
+  try{ id=navigator.geolocation.watchPosition(function(pos){ if(!best||pos.coords.accuracy<best.coords.accuracy) best=pos; if(best.coords.accuracy<=8||(Date.now()-t0>2500&&best.coords.accuracy<=20)||Date.now()-t0>7000) finish(); },function(x){ lastErr=x; if(done) return; if(!best){ clearTimeout(to); try{ if(id!==null) navigator.geolocation.clearWatch(id); }catch(e){} id=null; one(); } else finish(); },{enableHighAccuracy:true,maximumAge:0,timeout:12000}); }catch(e){ one(); return; }
   to=setTimeout(finish,8500); setTimeout(function(){ if(done) return; if(!best) one(); else if(best.coords.accuracy<=20) finish(); },3000);
 }
 /* détection automatique : l'app doit rester ouverte (un navigateur ne suit pas la position en arrière-plan) */
@@ -2855,6 +2936,7 @@ var PA={moveSince:0,drive:false,stillSince:0,still:null,last:null,cool:0}, _pwid
 function parkSpeed(a,b){ var dt=(b.timestamp-a.timestamp)/1000; if(!(dt>0.5)) return null; return hav(a.coords.latitude,a.coords.longitude,b.coords.latitude,b.coords.longitude)*1000/dt; }
 function parkAutoFeed(pos,now){
   now=now||Date.now(); var c=pos.coords, sp=(typeof c.speed==="number"&&isFinite(c.speed)&&c.speed>=0)?c.speed:(PA.last?parkSpeed(PA.last,pos):null);
+  tripFeed(pos);
   if(sp!==null){
     if(sp>=4){ if(!PA.moveSince) PA.moveSince=now; if(now-PA.moveSince>=25000) PA.drive=true; PA.stillSince=0; }
     else if(sp<1){ PA.moveSince=0; if(PA.drive){ if(!PA.stillSince){ PA.stillSince=now; PA.still=pos; } else if(now-PA.stillSince>=120000&&hav(PA.still.coords.latitude,PA.still.coords.longitude,c.latitude,c.longitude)*1000<40){ PA.drive=false; PA.stillSince=0; parkAutoPrompt(PA.still,now); } } }
@@ -2868,7 +2950,7 @@ function parkAutoPrompt(pos,now){
 }
 function parkAutoStart(){
   if(_pwid!==null||!navigator.geolocation) return;
-  try{ _pwid=navigator.geolocation.watchPosition(function(pos){ parkAutoFeed(pos); },function(){ parkAutoStop(); S.parkAuto=false; save(); toast("Localisation refusée : détection désactivée",true); var e=document.getElementById("pauto"); if(e) e.checked=false; },{enableHighAccuracy:true,maximumAge:5000,timeout:30000}); }catch(e){}
+  try{ _pwid=navigator.geolocation.watchPosition(function(pos){ parkAutoFeed(pos); },function(x){ parkAutoStop(); S.parkAuto=false; save(); var e=document.getElementById("pauto"); if(e) e.checked=false; geoFail(x); },{enableHighAccuracy:true,maximumAge:5000,timeout:30000}); }catch(e){}
 }
 function parkAutoStop(){ if(_pwid!==null&&navigator.geolocation){ try{ navigator.geolocation.clearWatch(_pwid); }catch(e){} } _pwid=null; PA.moveSince=0; PA.drive=false; PA.stillSince=0; PA.last=null; }
 function parkAutoToggle(on){ S.parkAuto=!!on; save(); if(on){ parkAutoStart(); toast("Détection activée : garde l’app ouverte pendant tes trajets"); } else { parkAutoStop(); toast("Détection désactivée"); } }
@@ -2901,7 +2983,8 @@ function parkInfoHTML(){
 }
 function parkCard(){
   var P=S.park, has=P&&(P.lat||P.note);
-  var h='<div class="card"><div class="row sp" style="margin-bottom:12px"><h2 style="margin:0">Voiture garée</h2>'+(has?'<button class="x" aria-label="Effacer" onclick="parkClear()">'+FI.x+'</button>':'')+'</div>';
+  var h='<div class="card"><div class="row sp" style="margin-bottom:12px"><h2 style="margin:0">Voiture garée</h2>'+(has?'<button class="x" aria-label="Effacer" onclick="parkClear()">'+FI.x+'</button>':'')+'</div>'+
+    '<div id="geobn" class="rtv warn" style="margin:0 0 12px;'+((_geoSt==="granted"||_geoSt==="unknown")?"display:none":"")+'"><i>'+FI.pin+'</i><div style="flex:1;min-width:0"><b>Localisation non autorisée</b><br><span class="mut" style="font-size:13px">Nécessaire pour enregistrer et retrouver la voiture.</span></div><button class="btn s" onclick="sheetGeo()">Autoriser</button></div>';
   if(has){
     var link=P.lat?"https://maps.apple.com/?daddr="+P.lat+","+P.lon+"&dirflg=w":"https://maps.apple.com/?q="+encodeURIComponent(P.note);
     h+=(P.lat?'<div class="mapbox" id="mapbox">'+mapInner()+'</div>':'<div class="pstage">'+carTopSVG(78,P.hdg)+'<b class="mpb big">P</b></div>')+
@@ -2914,6 +2997,7 @@ function parkCard(){
       '<div class="row" style="margin-top:14px;gap:8px"><button class="btn p s" style="flex:1.3" onclick="parkHere()">Je me gare ici</button><button class="btn s" style="flex:1" onclick="sheetPark()">Saisir un repère</button></div>';
   }
   h+='<label class="row" style="color:var(--tx);font-size:14px;margin-top:14px;align-items:flex-start;gap:10px"><input id="pauto" type="checkbox" '+(S.parkAuto?"checked":"")+' onchange="parkAutoToggle(this.checked)" style="margin-top:3px"><span style="flex:1;min-width:0">Détecter automatiquement le stationnement<small class="mut" style="display:block;font-size:12px;line-height:1.4;margin-top:2px">Propose d’enregistrer l’endroit quand tu t’arrêtes plus de 2 minutes après un trajet. Fonctionne seulement quand l’app est ouverte à l’écran.</small></span></label>';
+  h+='<label class="row" style="color:var(--tx);font-size:14px;margin-top:12px;align-items:flex-start;gap:10px"><input id="kauto" type="checkbox" '+(S.kmAuto?"checked":"")+' onchange="S.kmAuto=this.checked;save()" style="margin-top:3px"><span style="flex:1;min-width:0">Ajouter automatiquement les km au compteur<small class="mut" style="display:block;font-size:12px;line-height:1.4;margin-top:2px">À chaque nouveau stationnement, les kilomètres parcourus (tracé GPS, ou distance estimée) sont ajoutés au compteur, sans doublon avec tes saisies.</small></span></label>';
   return h+parkHistHTML()+'</div>';
 }
 function sheetPark(){
@@ -3389,7 +3473,7 @@ function fpPaint(){
         '<div class="mut" style="font-size:13px;line-height:1.45;margin-top:4px">'+esc((FP_FUELS[L.fuel]||FP_FUELS.e10)[0])+' · médiane de '+L.n+' station'+(L.n>1?"s":"")+(cfg.mode==="cp"&&cfg.cp?' (code postal '+esc(cfg.cp)+')':' dans '+cfg.km+' km')+' · mis à jour '+agoTxt(new Date(L.ts).toISOString())+'</div>'+
         '<div class="mut" style="font-size:13px;line-height:1.45">Le moins cher : <b style="color:var(--tx)">'+n2(L.min,3)+' €</b>'+(L.minSt?' · '+esc(L.minSt):'')+'</div>';
     } else h_+='<div class="mut" style="line-height:1.45;margin-top:8px">Le prix n’a pas encore été récupéré. Prix utilisé : <b style="color:var(--tx)">'+n2(S.v.price,3)+' €/L</b> (saisi).</div>';
-    if(S.fp.err) h_+='<div class="ivw" style="margin-top:8px"><div>'+esc(fpErrTxt(S.fp.err))+'</div></div>';
+    if(S.fp.err) h_+='<div class="ivw" style="margin-top:8px"><div>'+esc(fpErrTxt(S.fp.err))+'</div>'+(S.fp.err==="geo"?'<button class="btn s" style="margin-top:8px" onclick="sheetGeo()">Autoriser la localisation</button>':'')+'</div>';
     h_+='<div class="row" style="gap:8px;margin-top:10px;flex-wrap:wrap"><span class="mut" style="font-size:12px;flex:1;min-width:0">'+(cfg.on?'Mise à jour automatique activée (au plus toutes les 6 h).':'Mise à jour automatique désactivée : le prix saisi est utilisé.')+'</span><button class="btn s" onclick="sheetFp()">Régler</button></div>';
     el.innerHTML=h_; var bt=document.getElementById("fpr"); if(bt) bt.textContent="Actualiser";
   }
