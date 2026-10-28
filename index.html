@@ -585,7 +585,9 @@ a.btn{display:inline-flex}
 .qkt b{display:block;font-size:16px;line-height:1.3;overflow-wrap:anywhere}
 .qkt input{width:100%;margin-top:2px}
 .qkr{gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--tx)}
-html,body{touch-action:manipulation;-webkit-text-size-adjust:100%}
+html,body{overflow-x:hidden;max-width:100%;overscroll-behavior-x:none;touch-action:pan-y;-webkit-text-size-adjust:100%}
+.gdw,.chart,.hscroll{touch-action:pan-x pan-y;overscroll-behavior-x:contain}
+#view{overflow-x:clip}
 button,a,label,select,summary,[onclick]{touch-action:manipulation}
 input,select,textarea{font-size:16px}
 .mview{position:absolute;inset:0;overflow:hidden;touch-action:none;cursor:grab;background:var(--mbg,#e6e3dc);-webkit-user-select:none;user-select:none;contain:strict}
@@ -628,15 +630,15 @@ a.btn[href],label.btn,.btn[for]{display:inline-flex;align-items:center;justify-c
 .pkgo{flex:1;min-height:48px;font-size:16px}
 .pkmore{width:48px;min-height:48px;padding:0;flex:0 0 auto}
 .mlist{display:flex;flex-direction:column}
-.mrow{display:flex;align-items:center;gap:13px;width:100%;padding:12px 2px;background:none;border:0;border-bottom:1px solid var(--line);text-align:left;color:var(--tx);font:inherit;cursor:pointer;box-sizing:border-box}
-.mlist>.mrow:last-child{border-bottom:0}
-.mrow>i{width:36px;height:36px;border-radius:12px;background:var(--line);display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-style:normal}
-.mrow>i svg{width:19px;height:19px}
-.mrow b{display:block;font-size:15.5px;font-weight:600}
-.mrow small{display:block;color:var(--mut);font-size:12.5px;line-height:1.35;margin-top:1px}
-.mrow>span{flex:1;min-width:0}
-.mrow.swr{cursor:default}
-.mrow.dng b,.mrow.dng>i{color:var(--bad)}
+.pmr{display:flex;align-items:center;gap:13px;width:100%;padding:12px 2px;background:none;border:0;border-bottom:1px solid var(--line);text-align:left;color:var(--tx);font:inherit;cursor:pointer;box-sizing:border-box}
+.mlist>.pmr:last-child{border-bottom:0}
+.pmr>i{width:36px;height:36px;border-radius:12px;background:var(--line);display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-style:normal}
+.pmr>i svg{width:19px;height:19px}
+.pmr b{display:block;font-size:15.5px;font-weight:600}
+.pmr small{display:block;color:var(--mut);font-size:12.5px;line-height:1.35;margin-top:1px}
+.pmr>span{flex:1;min-width:0}
+.pmr.swr{cursor:default}
+.pmr.dng b,.pmr.dng>i{color:var(--bad)}
 .msec{font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--mut);margin:16px 0 2px}
 input[type=datetime-local],input[type=time]{-webkit-appearance:none;appearance:none;display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;min-height:46px;text-align:left}
 input[type=datetime-local]::-webkit-date-and-time-value{text-align:left}
@@ -661,6 +663,64 @@ input[type=datetime-local]::-webkit-date-and-time-value{text-align:left}
 .sxfu span{position:absolute;right:15px;top:50%;transform:translateY(-50%);color:var(--mut);font-size:15px}
 .sxdt{display:flex;align-items:center;justify-content:space-between;padding:6px 6px 6px 14px;border:1px solid var(--line);border-radius:14px;min-height:46px;box-sizing:border-box}
 .sxdt span{font-size:16px}
+.rtx-title{text-overflow:ellipsis;font-size:20px;font-weight:800;letter-spacing:-.5px;background:transparent;border:0;border-bottom:1px solid var(--line);padding:6px 2px 8px;border-radius:0;box-shadow:none}
+.rtx-title:focus{border-bottom-color:rgb(var(--ar,200,16,46));box-shadow:none}
+.rtx-card{margin-top:14px;padding:6px 12px 8px;border-radius:22px;background:rgba(var(--hf,255,255,255),.05);border:1px solid var(--line);position:relative}
+.rtx-pt{display:flex;align-items:center;gap:12px;position:relative;z-index:1}
+.rtx-dot{width:30px;height:30px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;background:var(--line);color:var(--tx);border:2px solid transparent}
+.rtx-dot.a{background:linear-gradient(180deg,var(--a1,#e0233f),var(--a2,#c8102e));color:#fff;box-shadow:0 6px 14px -8px rgba(var(--ar,200,16,46),.9)}
+.rtx-dot.b{background:#fff;color:#111;border-color:rgb(var(--ar,200,16,46))}
+.rtx-fld{flex:1;min-width:0;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--line)}
+.rtx-in{flex:1;min-width:0;border:0;background:transparent;padding:14px 2px;font-size:16px;color:var(--tx);border-radius:0;box-shadow:none;width:auto}
+.rtx-in:focus{border:0;box-shadow:none}
+.rtx-ok{width:8px;height:8px;border-radius:50%;background:#3ddc84;box-shadow:0 0 8px #3ddc84;flex:0 0 auto}
+.rtx-loc,.rtx-ic{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:rgba(var(--hf,255,255,255),.08);color:var(--mut);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto;padding:0;transition:all .2s}
+.rtx-loc.on{color:#fff;background:#0a84ff;border-color:transparent}
+.rtx-ic.sm{width:30px;height:30px}
+.rtx-ic svg,.rtx-ic.sm svg{width:16px;height:16px}
+.rtx-leg{display:flex;align-items:center;gap:8px;margin:0 0 0 0;padding:8px 0 8px 42px;position:relative}
+.rtx-leg::before{content:"";position:absolute;left:14px;top:-4px;bottom:-4px;width:2px;background:repeating-linear-gradient(180deg,rgba(var(--ar,200,16,46),.55) 0 4px,transparent 4px 8px);border-radius:2px}
+.rtx-cw{flex:1;min-width:0}
+.rtx-chip{display:flex;flex-direction:column;align-items:flex-start;gap:1px;background:rgba(var(--hf,255,255,255),.07);border:1px solid var(--line);border-radius:14px;padding:7px 12px;color:var(--tx);font:inherit;cursor:pointer;text-align:left;max-width:100%;position:relative}
+.rtx-chip b{font-size:16px;letter-spacing:-.3px;font-variant-numeric:tabular-nums}
+.rtx-chip span{font-size:13px;color:var(--mut)}
+.rtx-chip small{font-size:11px;color:var(--mut);line-height:1.2}
+.rtx-l1{display:block}
+.rtx-l1 em{font-style:normal;font-size:13px;color:var(--mut)}
+.rtx-chip.ed{flex-direction:row;align-items:center;gap:8px;padding:4px 10px;cursor:default}
+.rtx-chip.ed input{width:84px;padding:6px 8px;font-size:16px;border-radius:10px}
+.rtx-chip .spin{position:absolute;right:10px;top:10px}
+.rtx-act{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+.rtx-add{display:flex;align-items:center;gap:8px;background:none;border:0;color:var(--mut);font:600 14px inherit;font-family:inherit;padding:10px 2px 6px 42px;cursor:pointer}
+.rtx-add svg{width:16px;height:16px}
+.rtx-sug{margin:0 0 4px 42px}
+.rtx-sl{border:1px solid var(--line);border-radius:16px;background:var(--card);overflow:hidden;box-shadow:0 12px 30px -16px rgba(0,0,0,.6)}
+.rtx-sr{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:10px 12px;color:var(--tx);font:inherit;cursor:pointer}
+.rtx-sr:last-child{border-bottom:0}
+.rtx-si{width:30px;height:30px;border-radius:10px;background:var(--line);display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-style:normal}
+.rtx-si svg{width:16px;height:16px}
+.rtx-sr b{display:block;font-size:14.5px;font-weight:600}
+.rtx-sr small{display:block;font-size:12px;color:var(--mut)}
+.rtx-sr>span{min-width:0}
+.rtx-sm{padding:10px 12px;font-size:13px;color:var(--mut);display:flex;align-items:center;gap:8px}
+.rtx-mapw{margin-top:12px}
+.rtx-map{position:relative;overflow:hidden;border-radius:20px;border:1px solid var(--line);background:var(--mbg,#e6e3dc);background-image:linear-gradient(rgba(128,128,128,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(128,128,128,.12) 1px,transparent 1px);background-size:32px 32px}
+.rtx-map .mtl{position:absolute;inset:0}
+.rtx-map .mtl img{position:absolute;width:256px;height:256px;max-width:none;opacity:0;transition:opacity .3s}
+.rtx-map .mtl img.on{opacity:1}
+.rtx-map svg{position:absolute;left:0;top:0;z-index:2}
+.rtx-map::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;background:radial-gradient(130% 100% at 50% 45%,transparent 55%,var(--mvg,rgba(0,0,0,.3)))}
+.rtx-mf{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;font-size:15px}
+.rtx-mph{display:flex;align-items:center;gap:12px;padding:16px;border-radius:20px;border:1px dashed var(--line);color:var(--mut);font-size:13.5px;line-height:1.4}
+.rtx-mph svg{flex:0 0 auto}
+.rtx-sec{font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--mut);margin:18px 0 8px}
+.rtx-days{display:flex;justify-content:space-between;gap:4px;margin-top:0}
+.rtx-days button{flex:0 0 auto;width:38px;height:38px;border-radius:50%;padding:0;font-size:13px}
+.rtx-wc{margin-top:12px;border-bottom:0}
+.rtx-kp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.rtx-kp div{padding:10px 12px;border-radius:16px;background:var(--line)}
+.rtx-kp span{display:block;font-size:12px;color:var(--mut)}
+.rtx-kp b{display:block;font-size:17px;letter-spacing:-.3px;font-variant-numeric:tabular-nums}
 .hcs{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 .hch{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:transparent;color:var(--mut);border-radius:99px;padding:6px 11px;font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .2s}
 .hch i{width:9px;height:9px;border-radius:50%;display:block;opacity:.4}
@@ -2454,91 +2514,181 @@ function weekSim(scen){
   }
   return {days:out,eff:eff,E0:st.E0};
 }
-function rtBlank(){ return {id:uid(),name:"Domicile → Travail",days:[1,2,3,4,5],pts:[{label:"Domicile"},{label:"Travail"}],legs:[""],backKm:"",wc:{on:false,kw:2.3,hours:8}}; }
+function rtBlank(){ return {id:uid(),name:"",autoName:true,days:[1,2,3,4,5],pts:[{label:""},{label:""}],legs:[""],src:[],dur:[],geom:[],backKm:"",wc:{on:false,kw:2.3,hours:8}}; }
+/* ---------- Itinéraires : de A à B grâce à la localisation ---------- */
+var RT_UI={q:0,seq:0,list:[],rows:[],i:-1,busy:{},edit:-1,loading:false,err:false};
+function rtShort(x){ var a=x.address||{}, road=((a.house_number?a.house_number+" ":"")+(a.road||a.pedestrian||a.footway||a.path||"")).trim(), city=a.city||a.town||a.village||a.municipality||"";
+  var title=road||x.name||(x.display_name||"").split(",")[0]||"", sub=((a.postcode?a.postcode+" ":"")+city).trim(); return {title:title,sub:sub}; }
+function rtShortName(l){ l=(l||"").split(",")[0].trim(); return l.length>15?l.slice(0,14)+"…":l; }
+function rtAutoLabel(r){ var a=rtShortName(r.pts[0].label), b=rtShortName(r.pts[r.pts.length-1].label); return a&&b?a+" → "+b:""; }
+function rtAutoName(){ if(rt&&rt.autoName){ var l=rtAutoLabel(rt); if(l){ rt.name=l; var e=document.getElementById("rt_n"); if(e&&document.activeElement!==e) e.value=l; } } }
+function rtPlaces(){
+  var out=[], seen={}, add=function(l,la,lo,tag){ if(!l||!la) return; var k=l.toLowerCase(); if(seen[k]) return; seen[k]=1; out.push({label:l,sub:tag||"",lat:la,lon:lo}); };
+  if(S.park&&S.park.lat) add(S.park.addr||S.park.note||"Voiture garée",S.park.lat,S.park.lon,"Voiture garée");
+  (S.routes||[]).forEach(function(r){ (r.pts||[]).forEach(function(q){ if(q.lat) add(q.label,q.lat,q.lon,"Récent"); }); });
+  return out.slice(0,5);
+}
+function rtDecim(c){ var o=[], k=Math.max(1,Math.ceil(c.length/50)), i; for(i=0;i<c.length;i+=k) o.push([Math.round(c[i][0]*1e5)/1e5,Math.round(c[i][1]*1e5)/1e5]); var l=c[c.length-1]; o.push([Math.round(l[0]*1e5)/1e5,Math.round(l[1]*1e5)/1e5]); return o; }
+function rtComputeLeg(j,force){
+  var a=rt.pts[j], b=rt.pts[j+1]; if(!a||!b||!a.lat||!b.lat) return Promise.resolve(false);
+  if(!rt.src) rt.src=[]; if(!rt.dur) rt.dur=[]; if(!rt.geom) rt.geom=[];
+  if(!force&&rt.src[j]==="man"&&parseFloat(rt.legs[j])>0) return Promise.resolve(false);
+  var g=Math.round(hav(a.lat,a.lon,b.lat,b.lon)*ROADK*10)/10; rt.legs[j]=g; rt.src[j]="gps"; rt.dur[j]=Math.max(1,Math.round(g/45*60)); rt.geom[j]=null; RT_UI.busy[j]=true;
+  var tok=rt.id;
+  return rtFetch("https://router.project-osrm.org/route/v1/driving/"+a.lon+","+a.lat+";"+b.lon+","+b.lat+"?overview=simplified&geometries=geojson",7000).then(function(r){
+    var o=r&&r.routes&&r.routes[0]; if(!o||!(o.distance>0)) throw new Error("route"); if(!rt||rt.id!==tok) return false;
+    rt.legs[j]=Math.round(o.distance/100)/10; rt.src[j]="route"; rt.dur[j]=Math.max(1,Math.round(o.duration/60)); rt.geom[j]=(o.geometry&&o.geometry.coordinates&&o.geometry.coordinates.length>1)?rtDecim(o.geometry.coordinates):null; return true;
+  }).catch(function(){ return false; }).then(function(ok){ RT_UI.busy[j]=false; if(rt&&rt.id===tok&&document.getElementById("rtbody")) rtRender(); return ok; });
+}
+function rtAfterPoint(i){
+  rtAutoName(); var js_=[i-1,i].filter(function(j){ return j>=0&&j<rt.legs.length; });
+  js_.forEach(function(j){ var a=rt.pts[j], b=rt.pts[j+1]; if(a&&b&&a.lat&&b.lat){ if(!rt.src) rt.src=[]; if(rt.src[j]==="man") rt.src[j]="gps"; } });
+  js_.forEach(function(j){ rtComputeLeg(j,true); }); rtRender();
+}
+function rtPt(i,v){
+  var pt=rt.pts[i]; pt.label=v; if(pt.lat){ delete pt.lat; delete pt.lon; delete pt.me; } rtAutoName(); rtSearch(i,v);
+}
+function rtSearch(i,q){
+  clearTimeout(RT_UI.q); RT_UI.i=i; q=(q||"").trim();
+  if(q.length<3){ RT_UI.list=[]; RT_UI.loading=false; RT_UI.err=false; rtSugPaint(i); return; }
+  RT_UI.q=setTimeout(function(){
+    var my=++RT_UI.seq; RT_UI.loading=true; RT_UI.err=false; rtSugPaint(i);
+    rtFetch("https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=5&countrycodes=fr&accept-language=fr&q="+encodeURIComponent(q),7000).then(function(r){
+      if(my!==RT_UI.seq) return; RT_UI.list=(r||[]).map(function(x){ var t=rtShort(x); return {label:(t.title+(t.sub?", "+t.sub:"")).replace(/^, /,""),title:t.title,sub:t.sub,lat:parseFloat(x.lat),lon:parseFloat(x.lon)}; }); RT_UI.loading=false; rtSugPaint(i);
+    }).catch(function(){ if(my!==RT_UI.seq) return; RT_UI.loading=false; RT_UI.list=[]; RT_UI.err=true; rtSugPaint(i); });
+  },420);
+}
+function rtSugPaint(i){
+  var el=document.getElementById("rt_sug_"+i); if(!el) return; var inp=document.getElementById("rt_in_"+i), q=inp?inp.value.trim():"", rows=[], h_="";
+  if(RT_UI.i!==i){ el.innerHTML=""; return; }
+  var ic=function(s){ return '<i class="rtx-si">'+s+'</i>'; };
+  if(q.length<3){ rows.push({me:true}); rtPlaces().forEach(function(pl){ rows.push({label:pl.label,title:pl.label.split(",")[0],sub:pl.sub||pl.label.split(",").slice(1).join(",").trim(),lat:pl.lat,lon:pl.lon,place:true}); }); }
+  else { RT_UI.list.forEach(function(r){ rows.push(r); }); }
+  RT_UI.rows=rows;
+  rows.forEach(function(r,k){ h_+='<button class="rtx-sr" onpointerdown="event.preventDefault();rtPick('+i+','+k+')">'+(r.me?ic(FI.target)+'<span><b>Ma position</b><small>Utiliser ma localisation actuelle</small></span>':ic(FI.pin)+'<span><b>'+esc(r.title||r.label)+'</b><small>'+esc(r.sub||"")+'</small></span>')+'</button>'; });
+  if(q.length>=3&&RT_UI.loading) h_+='<div class="rtx-sm"><span class="spin"></span>Recherche…</div>';
+  else if(q.length>=3&&RT_UI.err) h_+='<div class="rtx-sm">Recherche indisponible (réseau). Utilise « Ma position ».</div>';
+  else if(q.length>=3&&!rows.length) h_+='<div class="rtx-sm">Aucun résultat. Précise l’adresse ou la ville.</div>';
+  el.innerHTML=h_?'<div class="rtx-sl">'+h_+'</div>':"";
+}
+function rtFocus(i){ RT_UI.i=i; rtSugPaint(i); }
+function rtBlur(i){ setTimeout(function(){ if(RT_UI.i===i){ RT_UI.i=-1; var el=document.getElementById("rt_sug_"+i); if(el) el.innerHTML=""; } },200); }
+function rtPick(i,k){
+  var r=RT_UI.rows[k]; if(!r) return; if(r.me){ rtGeo(i); return; }
+  var pt=rt.pts[i]; pt.label=r.label; pt.lat=r.lat; pt.lon=r.lon; delete pt.me; RT_UI.i=-1; var inp=document.getElementById("rt_in_"+i); if(inp) inp.blur(); rtAfterPoint(i);
+}
+function rtGeo(i){
+  if(!navigator.geolocation){ toast("Localisation indisponible",true); return; }
+  RT_UI.i=-1; toast("Recherche de la position…",true);
+  navigator.geolocation.getCurrentPosition(function(pos){
+    var pt=rt.pts[i], had=(pt.label||"").trim(); pt.lat=pos.coords.latitude; pt.lon=pos.coords.longitude; pt.me=true; if(!had||had==="Position actuelle") pt.label="Position actuelle";
+    rtAfterPoint(i); toast("Position enregistrée");
+    rtFetch("https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=18&addressdetails=1&accept-language=fr&lat="+pt.lat+"&lon="+pt.lon,7000).then(function(r){
+      var t=rtShort(r||{}), a=(t.title+(t.sub?", "+t.sub:"")).replace(/^, /,""); if(a&&pt.me&&(pt.label==="Position actuelle")){ pt.label=a; rtAutoName(); if(document.getElementById("rtbody")) rtRender(); }
+    }).catch(function(){});
+  },function(x){ geoFail(x); },{enableHighAccuracy:true,timeout:12000});
+}
+function rtAutoLegs(){
+  var n_=0; if(!rt.src) rt.src=[]; if(!rt.dur) rt.dur=[];
+  rt.legs.forEach(function(x,i){ var a=rt.pts[i], b=rt.pts[i+1]; if(a&&b&&a.lat&&b.lat&&(x===""||x==null||rt.src[i]==="gps")){ rt.legs[i]=Math.round(hav(a.lat,a.lon,b.lat,b.lon)*ROADK*10)/10; rt.src[i]="gps"; rt.dur[i]=Math.max(1,Math.round(rt.legs[i]/45*60)); n_++; } });
+  return n_;
+}
+function rtAuto(){
+  var chain=Promise.resolve(), need=rt.pts.some(function(p){ return !p.lat&&(p.label||"").trim(); }); if(need) toast("Calcul de l’itinéraire…",true);
+  rt.pts.forEach(function(pt){ if(pt.lat||!(pt.label||"").trim()) return; chain=chain.then(function(){ return rtFetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=fr&q="+encodeURIComponent(pt.label)).then(function(r){ if(r&&r[0]){ pt.lat=parseFloat(r[0].lat); pt.lon=parseFloat(r[0].lon); } }).catch(function(){}); }); });
+  return chain.then(function(){ var k=rtAutoLegs(); rtRender(); var all=[]; rt.legs.forEach(function(x,j){ all.push(rtComputeLeg(j,true)); }); return Promise.all(all).then(function(){ if(!k&&!rt.pts.every(function(p){return p.lat;})) toast("Renseigne chaque lieu, ou touche le repère de position.",true); }); });
+}
+function rtSwap(){
+  rt.pts.reverse(); rt.legs.reverse(); if(rt.src) rt.src.reverse(); if(rt.dur) rt.dur.reverse(); if(rt.geom){ rt.geom.reverse(); rt.geom=rt.geom.map(function(g){ return g?g.slice().reverse():g; }); }
+  if(rt.autoName) rtAutoName(); rtRender();
+}
+function rtLegEdit(i){ RT_UI.edit=i; rtRender(); var e=document.getElementById("rt_lg_"+i); if(e){ e.focus(); try{ e.select(); }catch(_){} } }
+function rtLegDone(i,v){ RT_UI.edit=-1; if(v!==undefined&&String(v).trim()!=="") rtLeg(i,v); rtRender(); }
+function rtLegHTML(i){
+  var km=parseFloat(rt.legs[i]), sr=(rt.src||[])[i], busy=!!RT_UI.busy[i], du=(rt.dur||[])[i];
+  var srt=sr==="route"?"itinéraire routier":(sr==="gps"?"estimé (à vol d’oiseau ×1,3)":(sr==="trace"?"mesuré en roulant":(sr==="man"?"saisi à la main":"")));
+  var chip;
+  if(RT_UI.edit===i) chip='<div class="rtx-chip ed"><input id="rt_lg_'+i+'" type="number" step="0.1" inputmode="decimal" value="'+(km>0?km:"")+'" placeholder="km" onblur="rtLegDone('+i+',this.value)" onkeydown="if(event.key===\'Enter\')this.blur()"><span>km</span></div>';
+  else if(km>0) chip='<button class="rtx-chip" onclick="rtLegEdit('+i+')" aria-label="Modifier la distance"><span class="rtx-l1"><b>'+n(km,1)+' km</b>'+(du>0?'<em> · ≈ '+(du>=60?Math.floor(du/60)+" h "+String(du%60).padStart(2,"0"):du+" min")+'</em>':"")+'</span>'+(busy?'<i class="spin"></i>':"")+'<small>'+srt+'</small></button>';
+  else chip='<button class="rtx-chip nod" onclick="rtLegEdit('+i+')">'+(busy?'<i class="spin"></i>':"")+'<span>Distance à calculer</span><small>Choisis les deux lieux, ou saisis les km</small></button>';
+  var act='<div class="rtx-act">'+(i===0?'<button class="rtx-ic" onclick="rtSwap()" aria-label="Inverser départ et arrivée" title="Inverser"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4v14M4 14l4 4 4-4M16 20V6M12 10l4-4 4 4"/></svg></button>':"")+(tk&&tk.i===i?'<button class="btn s" onclick="rtTrack('+i+')">Arrêter · <span id="rt_tk">'+n(tk.km,1)+' km</span></button>':'<button class="btn s" onclick="rtTrack('+i+')">Mesurer</button>')+'</div>';
+  return '<div class="rtx-leg"><div class="rtx-cw">'+chip+'</div>'+act+'</div>';
+}
+function rtMiniMap(){
+  var el=document.getElementById("rt_map"); if(!el||!rt) return; var P=[]; rt.pts.forEach(function(q,i){ if(q.lat) P.push({i:i,lat:q.lat,lon:q.lon}); });
+  if(P.length<2){ el.innerHTML='<div class="rtx-mph"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg><span>Le trajet s’affichera ici dès que le départ et l’arrivée seront placés.</span></div>'; return; }
+  var W=Math.max(260,el.clientWidth||320), H=Math.round(W*0.52), pad=36, all=P.map(function(q){ return [q.lat,q.lon]; }); (rt.geom||[]).forEach(function(g){ if(g) g.forEach(function(c){ all.push([c[1],c[0]]); }); });
+  var minLa=Math.min.apply(null,all.map(function(c){return c[0];})), maxLa=Math.max.apply(null,all.map(function(c){return c[0];})), minLo=Math.min.apply(null,all.map(function(c){return c[1];})), maxLo=Math.max.apply(null,all.map(function(c){return c[1];})), z=17;
+  for(;z>5;z--){ var w=mercX(maxLo,z)-mercX(minLo,z), hh=mercY(minLa,z)-mercY(maxLa,z); if(w<=W-2*pad&&hh<=H-2*pad) break; }
+  var ox=(mercX(minLo,z)+mercX(maxLo,z))/2-W/2, oy=(mercY(minLa,z)+mercY(maxLa,z))/2-H/2, tn=Math.pow(2,z), tx, ty, tl="";
+  for(tx=Math.floor(ox/256);tx<=Math.floor((ox+W)/256);tx++) for(ty=Math.floor(oy/256);ty<=Math.floor((oy+H)/256);ty++){ if(ty<0||ty>=tn) continue; tl+='<img alt="" draggable="false" src="https://tile.openstreetmap.org/'+z+'/'+(((tx%tn)+tn)%tn)+'/'+ty+'.png" style="left:'+(tx*256-ox).toFixed(1)+'px;top:'+(ty*256-oy).toFixed(1)+'px" onload="this.classList.add(\'on\')" onerror="this.remove()">'; }
+  var X=function(lo){ return mercX(lo,z)-ox; }, Y=function(la){ return mercY(la,z)-oy; }, sv="", j;
+  for(j=0;j<rt.pts.length-1;j++){ var a=rt.pts[j], b=rt.pts[j+1]; if(!a.lat||!b.lat) continue; var g=(rt.geom||[])[j], pts=g?g.map(function(c){ return [X(c[0]),Y(c[1])]; }):[[X(a.lon),Y(a.lat)],[X(b.lon),Y(b.lat)]], d="M"+pts.map(function(q){ return q[0].toFixed(1)+" "+q[1].toFixed(1); }).join(" L");
+    sv+='<path d="'+d+'" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="'+d+'" fill="none" stroke="rgb(var(--ar,200,16,46))" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"'+(g?"":' stroke-dasharray="1 8"')+'/>'; }
+  P.forEach(function(q){ var last=q.i===rt.pts.length-1, lab=q.i===0?"A":(last?"B":String(q.i)); sv+='<g transform="translate('+X(q.lon).toFixed(1)+' '+Y(q.lat).toFixed(1)+')"><circle r="13" fill="'+(q.i===0?"rgb(var(--ar,200,16,46))":"#fff")+'" stroke="'+(q.i===0?"#fff":"rgb(var(--ar,200,16,46))")+'" stroke-width="3"/><text y="4.6" text-anchor="middle" font-size="13" font-weight="800" fill="'+(q.i===0?"#fff":"#111")+'" style="font-family:inherit">'+lab+'</text></g>'; });
+  var tot=0, dur=0, okAll=true; rt.legs.forEach(function(x,k){ var v_=parseFloat(x); if(v_>0){ tot+=v_; dur+=(rt.dur&&rt.dur[k])||0; } else okAll=false; });
+  el.innerHTML='<div class="rtx-map" style="height:'+H+'px"><div class="mtl">'+tl+'</div><svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'">'+sv+'</svg></div>'+
+    '<div class="rtx-mf"><span><b>'+(tot>0?n(tot,1)+' km':'–')+'</b>'+(dur>0?' · ≈ '+(dur>=60?Math.floor(dur/60)+" h "+String(dur%60).padStart(2,"0"):dur+" min"):"")+(okAll?"":' <small class="mut">(partiel)</small>')+'</span><button class="btn s" onclick="rtMaps()">Plans '+FI.out+'</button></div>';
+}
+function rtRender(){
+  var el=document.getElementById("rtbody"); if(!el||!rt) return; var np=rt.pts.length;
+  var loc='<svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true"><path d="M12 2.5 4.6 20.4l.9.8L12 17.6l6.5 3.6.9-.8z"/></svg>';
+  var h='<input id="rt_n" class="rtx-title" type="text" value="'+esc(rt.name||"")+'" placeholder="Nom du trajet" oninput="rt.name=this.value;rt.autoName=false" aria-label="Nom de l’itinéraire">'+
+   '<div class="rtx-card">';
+  rt.pts.forEach(function(pt,i){
+    var last=i===np-1, mid=i>0&&!last, lab=i===0?"A":(last?"B":String(i)), ph=i===0?"Départ · adresse ou lieu":(last?"Arrivée · adresse ou lieu":"Étape");
+    h+='<div class="rtx-pt"><span class="rtx-dot'+(i===0?" a":(last?" b":""))+'">'+lab+'</span><div class="rtx-fld"><input id="rt_in_'+i+'" class="rtx-in" type="text" value="'+esc(pt.label||"")+'" placeholder="'+ph+'" autocomplete="off" autocorrect="off" oninput="rtPt('+i+',this.value)" onfocus="rtFocus('+i+')" onblur="rtBlur('+i+')">'+(pt.lat?'<i class="rtx-ok" title="Position enregistrée"></i>':'')+'<button class="rtx-loc'+(pt.me?" on":"")+'" onclick="rtGeo('+i+')" aria-label="Utiliser ma position" title="Ma position">'+loc+'</button>'+(mid?'<button class="rtx-ic sm" onclick="rtDel('+i+')" aria-label="Supprimer l’étape">'+FI.x+'</button>':'')+'</div></div><div class="rtx-sug" id="rt_sug_'+i+'"></div>';
+    if(!last) h+=rtLegHTML(i);
+  });
+  h+='<button class="rtx-add" onclick="rtAdd()">'+FI.plus+' Ajouter une étape</button></div>'+
+   '<div id="rt_map" class="rtx-mapw"></div>'+
+   '<div class="rtx-sec">Jours</div><div class="dch rtx-days">'+[1,2,3,4,5,6,0].map(function(d){ return '<button class="'+(rt.days.indexOf(d)>-1?"on":"")+'" onclick="rtDay('+d+')">'+DOWL[d]+'</button>'; }).join("")+'</div>'+
+   '<div class="rtx-sec">Retour</div><div class="seg"><button class="'+(rt.custom?"":"on")+'" onclick="rt.custom=false;rtRender()">Même trajet</button><button class="'+(rt.custom?"on":"")+'" onclick="rt.custom=true;rtRender()">Autre distance</button></div>'+
+   (rt.custom?'<div class="sxfu" style="margin-top:8px"><input type="number" step="0.1" inputmode="decimal" value="'+(rt.backKm||"")+'" placeholder="Distance du retour" oninput="rt.backKm=this.value;rtSum()"><span>km</span></div>':'')+
+   '<div class="pmr swr rtx-wc"><span><b>Recharge sur place</b><small>Je peux recharger au travail</small></span><button class="sw'+(rt.wc.on?" on":"")+'" aria-label="Recharge sur place" onclick="rt.wc.on=!rt.wc.on;rtRender()"></button></div>'+
+   (rt.wc.on?'<div class="grid" style="gap:12px"><div><label>Puissance (kW)</label><input type="number" step="0.1" inputmode="decimal" value="'+rt.wc.kw+'" oninput="rt.wc.kw=parseFloat(this.value)||0;rtSum()"></div><div><label>Durée sur place (h)</label><input type="number" step="0.5" inputmode="decimal" value="'+rt.wc.hours+'" oninput="rt.wc.hours=parseFloat(this.value)||0;rtSum()"></div></div>':'')+
+   '<div class="rtx-sec">Résultat</div><div id="rt_sum"></div>'+
+   (rt._new?'':'<button class="btn full" style="margin-top:14px;color:var(--bad)" onclick="rtDelete()">Supprimer cet itinéraire</button>');
+  var keep=document.activeElement&&document.activeElement.id, selS=null; el.innerHTML=h; rtSum(); rtMiniMap();
+  if(RT_UI.i>-1) rtSugPaint(RT_UI.i);
+}
+function rtSum(){
+  var box=document.getElementById("rt_sum"); if(!box||!rt) return;
+  var gb=routeGB(rt), eff=evEff();
+  if(!(gb.go>0)){ box.innerHTML='<div class="rtv warn" style="margin-top:0"><i>'+FI.warn+'</i><div>Renseigne les distances pour voir si l’autonomie suffit.</div></div>'; return; }
+  var days=rt.days.slice().sort(function(a,b){return (a||7)-(b||7);}), saved=S.routes; S.routes=[rt];
+  var sts={ok:0,warn:0,bad:0}, one=null; days.forEach(function(d){ var p=dayPlan(d,eff); if(p){ sts[p.status]++; one=p; } }); S.routes=saved;
+  var cls="ok", ttl="L’autonomie électrique suffit", sub=one?'Batterie ≥ '+one.start+' % au départ (marge '+P("marginPct")+' % incluse).':"";
+  if(one&&sts.bad){ cls="bad"; ttl="Autonomie électrique insuffisante"; sub='Il manque ≈ '+n(one.fuelKm,0)+' km par jour (autonomie ≈ '+n(eff,0)+' km'+(isWinter()?", hiver":"")+').'; }
+  else if(one&&sts.warn){ cls="warn"; ttl="Ça passe, mais juste"; sub='Batterie ≥ '+one.start+' % au départ.'; }
+  box.innerHTML='<div class="rtv '+cls+'" style="margin-top:0"><i>'+(cls==="ok"?FI.check:FI.warn)+'</i><div><b>'+ttl+'</b><br><span class="mut">'+sub+'</span></div></div>'+
+   '<div class="rtx-kp"><div><span>Aller</span><b>'+n(gb.go,1)+' km</b></div><div><span>Retour</span><b>'+n(gb.back,1)+' km</b></div><div><span>Par jour</span><b>'+n(gb.go+gb.back,1)+' km</b></div></div>';
+}
 function sheetRoute(id){
   if(tk) rtTrackStop(false);
   var ex=routesList().filter(function(r){return r.id===id;})[0];
-  rt=ex?JSON.parse(JSON.stringify(ex)):rtBlank(); rt._new=!ex; if(!rt.src) rt.src=[]; rt.custom=!!(rt.backKm>0);
+  rt=ex?JSON.parse(JSON.stringify(ex)):rtBlank(); rt._new=!ex; if(!rt.src) rt.src=[]; if(!rt.dur) rt.dur=[]; if(!rt.geom) rt.geom=[]; rt.custom=!!(rt.backKm>0);
+  rt.autoName=ex?(rt.name===rtAutoLabel(rt)):true; RT_UI={q:0,seq:0,list:[],rows:[],i:-1,busy:{},edit:-1,loading:false,err:false};
   sheet(ex?"Modifier l’itinéraire":"Nouvel itinéraire",'<div id="rtbody"></div>',function(){ return rtSave(); },"Enregistrer");
   rtRender();
 }
-function rtRender(){
-  var el=document.getElementById("rtbody"); if(!el||!rt) return;
-  var h='<label>Nom</label><input id="rt_n" type="text" value="'+esc(rt.name)+'" oninput="rt.name=this.value">'+
-   '<label>Jours</label><div class="dch">'+[1,2,3,4,5,6,0].map(function(d){ return '<button class="'+(rt.days.indexOf(d)>-1?"on":"")+'" onclick="rtDay('+d+')">'+DOWL[d]+'</button>'; }).join("")+'</div>'+
-   '<div class="sec" style="margin:16px 0 0">Parcours (aller)</div>';
-  rt.pts.forEach(function(pt,i){
-    var mid=i>0&&i<rt.pts.length-1, ph=i===0?"Domicile":(i===rt.pts.length-1?"Travail":"Étape");
-    h+='<div class="rtp"><div class="row" style="gap:8px"><span class="rtn">'+(i+1)+'</span><input class="rtl" type="text" value="'+esc(pt.label||"")+'" placeholder="'+ph+' (adresse ou lieu)" style="flex:1;min-width:0" oninput="rtPt('+i+',this.value)"><button class="x" onclick="rtGeo('+i+')" aria-label="Utiliser ma position" title="Utiliser ma position">'+FI.pin+'</button>'+(mid?'<button class="x" onclick="rtDel('+i+')" aria-label="Supprimer l’étape">'+FI.x+'</button>':'')+'</div>'+
-      (pt.lat?'<div class="mut" style="font-size:11px;margin:3px 0 0 32px">Position enregistrée</div>':'')+'</div>';
-    if(i<rt.pts.length-1){ var sr=(rt.src||[])[i], srt=sr==="gps"?"estimé à vol d’oiseau ×1,3":(sr==="route"?"itinéraire routier":(sr==="trace"?"mesuré en roulant":""));
-      h+='<div class="rtg">'+FI.down+' <input type="number" step="0.1" inputmode="decimal" placeholder="km" value="'+(rt.legs[i]===""||rt.legs[i]==null?"":rt.legs[i])+'" oninput="rtLeg('+i+',this.value)"> km'+(tk&&tk.i===i?'<button class="btn s" style="margin-left:auto" onclick="rtTrack('+i+')">Arrêter · <span id="rt_tk">'+n(tk.km,1)+' km</span></button>':'<button class="btn s" style="margin-left:auto" onclick="rtTrack('+i+')">Mesurer</button>')+'</div>'+(srt?'<div class="mut" style="font-size:11px;margin:2px 0 0 32px">'+srt+'</div>':''); }
-  });
-  h+='<div class="rtb"><button class="btn s" onclick="rtAdd()">'+FI.plus+' Étape</button><button class="btn s" onclick="rtAuto()">'+FI.spark+' Calcul auto</button><button class="btn s" onclick="rtMaps()">Plans '+FI.out+'</button></div><div class="mut" id="rt_hint" style="font-size:12px;margin-top:8px;line-height:1.4">Touche '+FI.pin+' sur chaque lieu pour un calcul automatique, ou « Mesurer » pendant que tu roules.</div>'+
-   '<label>Retour</label><div class="seg"><button class="'+(rt.custom?"":"on")+'" onclick="rt.custom=false;rtRender()">Même trajet</button><button class="'+(rt.custom?"on":"")+'" onclick="rt.custom=true;rtRender()">Autre distance</button></div>'+
-   (rt.custom?'<label>Distance du retour (km)</label><input type="number" step="0.1" inputmode="decimal" value="'+(rt.backKm||"")+'" oninput="rt.backKm=this.value;rtSum()">':'')+
-   '<label class="row" style="color:var(--tx);font-size:15px;margin-top:14px"><input type="checkbox" '+(rt.wc.on?"checked":"")+' onchange="rt.wc.on=this.checked;rtRender()"> Je peux recharger sur place (travail)</label>'+
-   (rt.wc.on?'<div class="grid" style="gap:12px"><div><label>Puissance (kW)</label><input type="number" step="0.1" inputmode="decimal" value="'+rt.wc.kw+'" oninput="rt.wc.kw=parseFloat(this.value)||0;rtSum()"></div><div><label>Durée sur place (h)</label><input type="number" step="0.5" inputmode="decimal" value="'+rt.wc.hours+'" oninput="rt.wc.hours=parseFloat(this.value)||0;rtSum()"></div></div>':'')+
-   '<div class="sec" style="margin:16px 0 6px">Résultat</div><div class="ivw" id="rt_sum"></div>'+
-   (rt._new?'':'<button class="btn full" style="margin-top:14px;color:var(--bad)" onclick="rtDelete()">Supprimer cet itinéraire</button>');
-  el.innerHTML=h; rtSum();
-}
-function rtPt(i,v){ rt.pts[i].label=v; }
 function rtLeg(i,v){ rt.legs[i]=v; if(rt.src) rt.src[i]="man"; rtSum(); }
 function rtDay(d){ var k=rt.days.indexOf(d); if(k>-1) rt.days.splice(k,1); else rt.days.push(d); rtRender(); }
-function rtAdd(){ rt.pts.splice(rt.pts.length-1,0,{label:""}); rt.legs.splice(rt.legs.length-1,0,""); rtRender(); }
-function rtDel(i){ rt.pts.splice(i,1); rt.legs.splice(i-1,1); rtRender(); }
-function rtSum(){
-  var box=document.getElementById("rt_sum"); if(!box||!rt) return;
-  var gb=routeGB(rt), eff=evEff(), G=GEN[genId()], out=[];
-  if(!(gb.go>0)){ box.innerHTML='<div class="i">Renseigne les distances pour voir si l’autonomie suffit.</div>'; return; }
-  out.push('<div class="i">Aller '+n(gb.go,1)+' km · retour '+n(gb.back,1)+' km · total '+n(gb.go+gb.back,1)+' km par jour.</div>');
-  var days=rt.days.slice().sort(function(a,b){return (a||7)-(b||7);}), saved=S.routes; S.routes=[rt];
-  var sts={ok:0,warn:0,bad:0}, one=null; days.forEach(function(d){ var p=dayPlan(d,eff); if(p){ sts[p.status]++; one=p; } }); S.routes=saved;
-  if(one){ var msg=sts.bad?'<div>'+FI.warn+' Autonomie électrique insuffisante : il manque ≈ '+n(one.fuelKm,0)+' km par jour (autonomie ≈ '+n(eff,0)+' km'+(isWinter()?', hiver':'')+').</div>':(sts.warn?'<div>'+FI.warn+' Ça passe mais juste : batterie ≥ '+one.start+' % au départ.</div>':'<div class="i" style="background:rgba(50,200,110,.15)">L’autonomie électrique suffit : batterie ≥ '+one.start+' % au départ (marge '+P("marginPct")+' % incluse).</div>');
-    out.push(msg); }
-  box.innerHTML=out.join("");
-}
+function rtAdd(){ var k=rt.legs.length-1; rt.pts.splice(rt.pts.length-1,0,{label:""}); rt.legs.splice(k,1,"",""); if(!rt.src) rt.src=[]; if(!rt.dur) rt.dur=[]; if(!rt.geom) rt.geom=[]; rt.src.splice(k,1,null,null); rt.dur.splice(k,1,null,null); rt.geom.splice(k,1,null,null); rtRender(); }
+function rtDel(i){ rt.pts.splice(i,1); rt.legs.splice(i-1,2,""); if(rt.src) rt.src.splice(i-1,2,null); if(rt.dur) rt.dur.splice(i-1,2,null); if(rt.geom) rt.geom.splice(i-1,2,null); rtAutoName(); rtRender(); rtComputeLeg(i-1,true); }
 function rtSave(){
-  var nm=(rt.name||"").trim(); if(!nm){ toast("Donne un nom à l’itinéraire",true); return false; }
+  var nm=(rt.name||"").trim()||rtAutoLabel(rt)||"Itinéraire";
   if(!rt.days.length){ toast("Choisis au moins un jour",true); return false; }
   if(!(legsSum(rt)>0)||rt.legs.some(function(x){ return !(parseFloat(x)>0); })){ toast("Renseigne la distance de chaque tronçon",true); return false; }
-  var o=JSON.parse(JSON.stringify(rt)); delete o._new; o.name=nm; o.legs=o.legs.map(function(x){return parseFloat(x);}); if(!rt.custom) o.backKm=""; else o.backKm=parseFloat(rt.backKm)||"";
+  var o=JSON.parse(JSON.stringify(rt)); delete o._new; delete o.autoName; o.name=nm; o.legs=o.legs.map(function(x){return parseFloat(x);}); if(!rt.custom) o.backKm=""; else o.backKm=parseFloat(rt.backKm)||"";
   if(!S.routes) S.routes=[]; var k=S.routes.findIndex(function(r){return r.id===o.id;}); if(k>-1) S.routes[k]=o; else S.routes.push(o);
   save(); render(); toast("Itinéraire enregistré"); return true;
 }
 function rtDelete(){ ask("Supprimer cet itinéraire ?",function(){ S.routes=(S.routes||[]).filter(function(r){return r.id!==rt.id;}); save(); render(); toast("Itinéraire supprimé",true); },"Supprimer"); }
 var ROADK=1.3, tk=null;
-function rtAutoLegs(){
-  var n_=0; if(!rt.src) rt.src=[];
-  rt.legs.forEach(function(x,i){ var a=rt.pts[i], b=rt.pts[i+1]; if(a&&b&&a.lat&&b.lat&&(x===""||x==null||rt.src[i]==="gps")){ rt.legs[i]=Math.round(hav(a.lat,a.lon,b.lat,b.lon)*ROADK*10)/10; rt.src[i]="gps"; n_++; } });
-  return n_;
-}
-function rtGeo(i){
-  if(!navigator.geolocation){ toast("Localisation indisponible",true); return; }
-  toast("Recherche de la position…",true);
-  navigator.geolocation.getCurrentPosition(function(pos){
-    var pt=rt.pts[i]; pt.lat=pos.coords.latitude; pt.lon=pos.coords.longitude; if(!pt.label) pt.label="Position actuelle";
-    var k=rtAutoLegs(); rtRender(); toast(k?"Position enregistrée : distance calculée":"Position enregistrée");
-  },function(x){ geoFail(x); },{enableHighAccuracy:true,timeout:12000});
-}
 function rtFetch(url,ms){
   return new Promise(function(res,rej){ var c=new AbortController(), t=setTimeout(function(){ c.abort(); rej(new Error("delai")); },ms||6500);
     fetch(url,{signal:c.signal}).then(function(r){ clearTimeout(t); if(!r.ok) throw new Error("http"); return r.json(); }).then(res,function(e){ clearTimeout(t); rej(e); }); });
-}
-function rtAuto(){
-  var hint=function(t,spin){ var e=document.getElementById("rt_hint"); if(e){ if(spin) e.innerHTML='<span class="spin"></span>'+esc(t); else e.textContent=t; } };
-  var k=rtAutoLegs(), miss=[]; rt.legs.forEach(function(x,i){ if(x===""||x==null) miss.push(i); });
-  if(!miss.length){ rtRender(); hint(k?"Distances calculées à partir des positions (à vol d’oiseau ×1,3).":"Toutes les distances sont déjà renseignées."); return; }
-  var labels=rt.pts.map(function(p){return (p.label||"").trim();}); if(labels.some(function(l,i){ return !l&&!rt.pts[i].lat; })){ hint("Renseigne chaque lieu, ou touche le repère de position."); return; }
-  hint("Calcul de l’itinéraire…",true);
-  var chain=Promise.resolve();
-  rt.pts.forEach(function(pt){ if(pt.lat) return; chain=chain.then(function(){ return rtFetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q="+encodeURIComponent(pt.label)).then(function(r){ if(!r||!r[0]) throw new Error("introuvable"); pt.lat=parseFloat(r[0].lat); pt.lon=parseFloat(r[0].lon); }); }); });
-  rt.legs.forEach(function(x,i){ if(!(x===""||x==null)) return; chain=chain.then(function(){ var a=rt.pts[i], b=rt.pts[i+1];
-    return rtFetch("https://router.project-osrm.org/route/v1/driving/"+a.lon+","+a.lat+";"+b.lon+","+b.lat+"?overview=false").then(function(r){ var m=r&&r.routes&&r.routes[0]?r.routes[0].distance:null; if(!(m>0)) throw new Error("route"); rt.legs[i]=Math.round(m/100)/10; rt.src[i]="route"; }); }); });
-  chain.then(function(){ rtRender(); var e=document.getElementById("rt_hint"); if(e) e.textContent="Distances calculées en ligne (itinéraire routier)."; },function(){
-    rtAutoLegs(); rtRender(); hint("Calcul en ligne indisponible ici. Touche le repère de position sur chaque lieu ou mesure le trajet en roulant.");
-  });
 }
 function rtTrackStop(save_){
   if(!tk) return; try{ navigator.geolocation.clearWatch(tk.id); }catch(e){} clearTimeout(tk.to);
@@ -3133,15 +3283,15 @@ function sheetFooterClose(){ var r=document.querySelector("#sheet .pn>.row"); if
 function swPark(id){ var el=document.getElementById(id); if(!el) return; var on=!el.classList.contains("on"); el.classList.toggle("on",on); if(id==="pauto") parkAutoToggle(on); else { S.kmAuto=on; save(); } }
 function sheetParkMenu(){
   var P=S.park, has=P&&(P.lat||P.note);
-  var row=function(ic,t,s,fn,cls){ return '<button class="mrow '+(cls||"")+'" onclick="'+fn+'"><i>'+ic+'</i><span><b>'+t+'</b>'+(s?'<small>'+s+'</small>':'')+'</span></button>'; };
+  var row=function(ic,t,s,fn,cls){ return '<button class="pmr '+(cls||"")+'" onclick="'+fn+'"><i>'+ic+'</i><span><b>'+t+'</b>'+(s?'<small>'+s+'</small>':'')+'</span></button>'; };
   var body='<div class="mlist">'+
     row(FI.pin,has?"Mettre à jour ma position":"Je me gare ici",has?"Enregistre l’endroit où tu es maintenant":"Enregistre ta position actuelle","closeSheet();parkHere()")+
     row(FI.doc,has?"Modifier le repère":"Saisir un repère","Adresse, niveau, place, orientation, heure de fin","sheetPark()")+
-    (has?'<label class="mrow" for="pk_cam"><i>'+FI.cam+'</i><span><b>'+(P.img?"Changer la photo":"Ajouter une photo")+'</b><small>Photo de la place pour la retrouver</small></span></label><input id="pk_cam" type="file" accept="image/*" capture="environment" hidden onchange="parkPhoto(this)">':"")+
+    (has?'<label class="pmr" for="pk_cam"><i>'+FI.cam+'</i><span><b>'+(P.img?"Changer la photo":"Ajouter une photo")+'</b><small>Photo de la place pour la retrouver</small></span></label><input id="pk_cam" type="file" accept="image/*" capture="environment" hidden onchange="parkPhoto(this)">':"")+
     (has&&P.lat?row(FI.out,"Partager la position","Envoie un lien vers Plans","closeSheet();parkShare()"):"")+
     '</div><div class="msec">Automatisation</div><div class="mlist">'+
-    '<div class="mrow swr"><span><b>Détecter le stationnement</b><small>Propose d’enregistrer quand tu t’arrêtes plus de 2 min après un trajet. L’app doit rester ouverte.</small></span><button id="pauto" class="sw'+(S.parkAuto?" on":"")+'" aria-label="Détecter le stationnement" onclick="swPark(\'pauto\')"></button></div>'+
-    '<div class="mrow swr"><span><b>Ajouter les km au compteur</b><small>À chaque nouveau stationnement, sans doublon avec tes saisies.</small></span><button id="kauto" class="sw'+(S.kmAuto?" on":"")+'" aria-label="Ajouter les km automatiquement" onclick="swPark(\'kauto\')"></button></div></div>'+
+    '<div class="pmr swr"><span><b>Détecter le stationnement</b><small>Propose d’enregistrer quand tu t’arrêtes plus de 2 min après un trajet. L’app doit rester ouverte.</small></span><button id="pauto" class="sw'+(S.parkAuto?" on":"")+'" aria-label="Détecter le stationnement" onclick="swPark(\'pauto\')"></button></div>'+
+    '<div class="pmr swr"><span><b>Ajouter les km au compteur</b><small>À chaque nouveau stationnement, sans doublon avec tes saisies.</small></span><button id="kauto" class="sw'+(S.kmAuto?" on":"")+'" aria-label="Ajouter les km automatiquement" onclick="swPark(\'kauto\')"></button></div></div>'+
     (has?'<div class="mlist" style="margin-top:6px">'+row(FI.x,"Effacer la position","Elle reste dans l’historique","parkClear()","dng")+'</div>':"");
   sheet("Stationnement",body,function(){ return true; },"Fermer"); sheetFooterClose();
 }
