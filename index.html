@@ -604,6 +604,63 @@ input,select,textarea{font-size:16px}
 .pkcar .cimg,.pstage .cimg{display:block;height:auto;max-width:none;transition:transform .4s;-webkit-user-drag:none}
 .mchip,.mzoom,.mbtn,.mattr{z-index:5}
 .mbtn{position:absolute;right:10px;bottom:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;text-decoration:none;line-height:1.15}
+a.btn[href],label.btn,.btn[for]{display:inline-flex;align-items:center;justify-content:center}
+.pkc .mapbox{aspect-ratio:16/10;border-radius:24px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05),0 16px 34px -22px rgba(var(--ar,120,80,255),.65)}
+.mview::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:3;background:radial-gradient(130% 100% at 50% 42%,transparent 52%,var(--mvg,rgba(0,0,0,.34))),linear-gradient(180deg,rgba(var(--ar,120,80,255),.13),rgba(var(--ar,120,80,255),0) 42%,rgba(var(--ar,120,80,255),.10))}
+.mchip,.mzoom,.mloc{background:rgba(14,16,26,.58);-webkit-backdrop-filter:blur(16px) saturate(170%);backdrop-filter:blur(16px) saturate(170%);border:1px solid rgba(255,255,255,.16);color:#fff;box-shadow:0 6px 18px -8px rgba(0,0,0,.6)}
+.mchip[hidden]{display:none}
+.mchip{border-radius:999px;font-size:12.5px;font-weight:650;padding:7px 12px;letter-spacing:-.1px}
+.mzoom{border-radius:15px}
+.mzoom button{width:38px;height:38px;color:#fff;transition:background .15s}
+.mzoom button:active{background:rgba(255,255,255,.16)}
+.mzoom button svg{width:18px;height:18px}
+.mloc{position:absolute;right:10px;bottom:10px;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;transition:background .2s,transform .15s}
+.mloc:active{transform:scale(.94)}
+.mloc.on{background:rgba(10,132,255,.92);border-color:rgba(255,255,255,.4)}
+.mattr{left:8px;bottom:6px;font-size:9px;padding:1px 5px;background:rgba(255,255,255,.55);color:rgba(0,0,0,.55);border-radius:5px}
+.mac{background:rgba(var(--ar,120,80,255),.13);border:1px solid rgba(var(--ar,120,80,255),.5)}
+.pkcar::before{content:"";position:absolute;width:74px;height:74px;border-radius:50%;left:50%;top:50%;margin:-37px 0 0 -37px;background:radial-gradient(closest-side,rgba(var(--ar,120,80,255),.5),rgba(var(--ar,120,80,255),0));animation:pkp 2.8s ease-out infinite;pointer-events:none}
+@keyframes pkp{0%{transform:scale(.55);opacity:.95}100%{transform:scale(1.5);opacity:0}}
+.pkcar .mpb{right:-15px;top:-13px;width:17px;height:17px;font-size:10px;border-width:1.8px}
+.pkth{width:58px;height:58px;border-radius:15px;object-fit:cover;flex:0 0 auto;border:1px solid var(--line);cursor:pointer}
+.pkact{display:flex;gap:10px;margin-top:14px}
+.pkgo{flex:1;min-height:48px;font-size:16px}
+.pkmore{width:48px;min-height:48px;padding:0;flex:0 0 auto}
+.mlist{display:flex;flex-direction:column}
+.mrow{display:flex;align-items:center;gap:13px;width:100%;padding:12px 2px;background:none;border:0;border-bottom:1px solid var(--line);text-align:left;color:var(--tx);font:inherit;cursor:pointer;box-sizing:border-box}
+.mlist>.mrow:last-child{border-bottom:0}
+.mrow>i{width:36px;height:36px;border-radius:12px;background:var(--line);display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-style:normal}
+.mrow>i svg{width:19px;height:19px}
+.mrow b{display:block;font-size:15.5px;font-weight:600}
+.mrow small{display:block;color:var(--mut);font-size:12.5px;line-height:1.35;margin-top:1px}
+.mrow>span{flex:1;min-width:0}
+.mrow.swr{cursor:default}
+.mrow.dng b,.mrow.dng>i{color:var(--bad)}
+.msec{font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--mut);margin:16px 0 2px}
+input[type=datetime-local],input[type=time]{-webkit-appearance:none;appearance:none;display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;min-height:46px;text-align:left}
+input[type=datetime-local]::-webkit-date-and-time-value{text-align:left}
+.sxh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:4px}
+.sxr{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:rgba(var(--hf,255,255,255),.08);color:var(--tx);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto;transition:transform .15s,background .2s}
+.sxr:active{transform:scale(.92);background:var(--line)}
+.sxn{display:flex;align-items:baseline;justify-content:center;gap:4px;transition:color .25s}
+.sxn b{font-size:66px;line-height:1;letter-spacing:-3px;font-weight:800;font-variant-numeric:tabular-nums}
+.sxn span{font-size:24px;font-weight:700;opacity:.7}
+.sxbat{height:18px;border-radius:99px;background:var(--line);overflow:hidden;margin:12px 0 4px;position:relative}
+.sxbat i{display:block;height:100%;border-radius:99px;transition:width .3s cubic-bezier(.2,.8,.2,1),background .3s,box-shadow .3s}
+.sxrg{margin:8px 0 0;padding:0;height:30px;background:transparent;border:0}
+.sxq{display:flex;gap:6px;margin-top:6px}
+.sxq button{flex:1;padding:8px 0;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--mut);font:600 13px/1 inherit;font-family:inherit;cursor:pointer;transition:all .2s}
+.sxq button.on{background:var(--line);color:var(--tx);border-color:transparent}
+.sxmeta{margin-top:10px;font-size:13px;line-height:1.4;text-align:center}
+.sxm{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.sxm button{padding:11px 2px;border-radius:14px;border:1px solid var(--line);background:transparent;color:var(--mut);font-weight:650;font-size:13.5px;font-family:inherit;cursor:pointer;transition:all .2s}
+.sxm button.on{background:linear-gradient(180deg,var(--a1,#e0233f),var(--a2,#c8102e));color:#fff;border-color:transparent;box-shadow:0 8px 18px -10px rgba(var(--ar,200,16,46),.9)}
+.sxcap{font-size:12.5px;line-height:1.45;margin-top:8px}
+.sxfu{position:relative}.sxfu input{padding-right:48px}
+.sxfu span{position:absolute;right:15px;top:50%;transform:translateY(-50%);color:var(--mut);font-size:15px}
+.sxdt{display:flex;align-items:center;justify-content:space-between;padding:6px 6px 6px 14px;border:1px solid var(--line);border-radius:14px;min-height:46px;box-sizing:border-box}
+.sxdt span{font-size:16px}
 .hcs{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 .hch{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:transparent;color:var(--mut);border-radius:99px;padding:6px 11px;font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .2s}
 .hch i{width:9px;height:9px;border-radius:50%;display:block;opacity:.4}
@@ -644,9 +701,9 @@ input,select,textarea{font-size:16px}
 .pstage{position:relative;height:150px;border-radius:22px;background:radial-gradient(90% 90% at 50% 40%,rgba(var(--ar,200,16,46),.22),transparent 70%),linear-gradient(180deg,#141b27,#0a0f18);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden}
 .pstage::before{content:"";position:absolute;inset:18px 30%;border:2px dashed rgba(255,255,255,.2);border-radius:10px}
 .pstage .ctop{position:relative;filter:drop-shadow(0 8px 10px rgba(0,0,0,.5))}
-:root{--tf:none;--mbg:#e6e3dc}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--tf:invert(1) hue-rotate(180deg) brightness(.95) contrast(.92) saturate(.7);--mbg:#1b1e25}}
-:root[data-theme="dark"]{--tf:invert(1) hue-rotate(180deg) brightness(.95) contrast(.92) saturate(.7);--mbg:#1b1e25}
+:root{--tf:none;--mbg:#e6e3dc;--mvg:rgba(0,0,0,.16)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--tf:invert(1) hue-rotate(180deg) brightness(.95) contrast(.92) saturate(.7);--mbg:#1b1e25;--mvg:rgba(0,0,0,.4)}}
+:root[data-theme="dark"]{--tf:invert(1) hue-rotate(180deg) brightness(.95) contrast(.92) saturate(.7);--mbg:#1b1e25;--mvg:rgba(0,0,0,.4)}
 .sec{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.9px;color:var(--mut);margin:24px 6px 2px}
 a.btn{text-decoration:none;display:inline-block}
 .tgrid{display:grid;grid-template-columns:1fr 74px 1fr;gap:10px;align-items:stretch}
@@ -2783,10 +2840,13 @@ function mpXY(lat,lon,z){ return [mercX(lon,z),mercY(lat,z)]; }
 function mpLL(x,y,z){ var n=256*Math.pow(2,z), lon=x/n*360-180, a=Math.PI-2*Math.PI*y/n, lat=180/Math.PI*Math.atan(0.5*(Math.exp(a)-Math.exp(-a))); return [lat,lon]; }
 function mapInner(){ return (_tilesOK===false&&S.park&&S.park.lat)?planInner():""; }
 function mapChipTxt(){ var m=mapDist(); return m?fmtDist(m.d)+' · ≈ '+Math.max(1,Math.round(m.d/84))+' min à pied · cap '+dirTxt((Math.atan2(-m.dx,-m.dy)*180/Math.PI+360)%360):"Voiture garée"; }
-function mapChip(){ var c=document.getElementById("mchip"); if(c) c.textContent=mapChipTxt(); var b=document.getElementById("mmebtn"); if(b){ b.textContent=_wid!==null?"Arrêter le suivi":"Me localiser"; b.classList.toggle("on",_wid!==null); } }
+function mapChip(){
+  var c=document.getElementById("mchip"), m=mapDist(); if(c){ c.hidden=!m; if(m) c.textContent=mapChipTxt(); }
+  var b=document.getElementById("mmebtn"); if(b){ b.classList.toggle("on",_wid!==null); b.setAttribute("aria-pressed",_wid!==null?"true":"false"); }
+}
 function mapBuild(){
   var box=document.getElementById("mapbox"); if(!box||!S.park||!S.park.lat) return;
-  box.innerHTML='<div class="mview" id="mview"></div><div class="mchip" id="mchip">'+esc(mapChipTxt())+'</div><div class="mzoom"><button aria-label="Zoom avant" onclick="mapZoom(1)">'+FI.plus+'</button><button aria-label="Zoom arrière" onclick="mapZoom(-1)">−</button><button aria-label="Recentrer sur la voiture" onclick="mapRecenter()" style="font-size:15px">◎</button></div><button class="mbtn" id="mmebtn" onclick="toggleMe()">Me localiser</button><div class="mattr">© OpenStreetMap</div>';
+  box.innerHTML='<div class="mview" id="mview"></div><div class="mchip" id="mchip" hidden></div><div class="mzoom"><button aria-label="Zoom avant" onclick="mapZoom(1)">'+FI.plus+'</button><button aria-label="Zoom arrière" onclick="mapZoom(-1)"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"/></svg></button><button aria-label="Recentrer sur la voiture" onclick="mapRecenter()">'+FI.target+'</button></div><button class="mloc" id="mmebtn" aria-label="Me localiser" onclick="toggleMe()"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2.5 4.6 20.4l.9.8L12 17.6l6.5 3.6.9-.8z"/></svg></button><div class="mattr">© OpenStreetMap</div>';
   var v=document.getElementById("mview"); MP.W=v.clientWidth||360; MP.H=v.clientHeight||240; MP.L=null; MP.err=0; MP.anim=false;
   if(MP.clat===null||!MP.user){ MP.clat=S.park.lat; MP.clon=S.park.lon; }
   var z=mapZ||(MP.user&&MP.z?MP.z:mapAutoZ()); MP.hadMe=!!window._me; mapLayer(z); mapBind(v); mapChip();
@@ -2934,7 +2994,7 @@ function kmPrompt(r){
     '<label>Kilomètres à ajouter</label><input id="km_add" type="number" inputmode="decimal" step="1" value="'+Math.round(r.km)+'">'+
     '<div class="mut" style="font-size:13px;margin-top:6px">Compteur actuel : '+n(S.v.odo||0,0)+' km</div>'+
     '<label class="row" style="color:var(--tx);font-size:14px;margin-top:12px;gap:10px"><input id="km_auto" type="checkbox"> Ajouter automatiquement la prochaine fois</label>',
-    function(){ var a=parseFloat(v("km_add")); if(!(a>=0)) return false; if(document.getElementById("km_auto").checked){ S.kmAuto=true; var c=document.getElementById("kauto"); if(c) c.checked=true; } if(a>=1) kmApply(a); else { if(S.park) S.park.odoRef=S.v.odo; save(); } return true; },"Ajouter au compteur");
+    function(){ var a=parseFloat(v("km_add")); if(!(a>=0)) return false; if(document.getElementById("km_auto").checked){ S.kmAuto=true; var c=document.getElementById("kauto"); if(c) c.classList.add("on"); } if(a>=1) kmApply(a); else { if(S.park) S.park.odoRef=S.v.odo; save(); } return true; },"Ajouter au compteur");
 }
 function parkHistClean(){
   var L=S.parkHist; if(!L||!L.length) return; var out=[];
@@ -3022,13 +3082,13 @@ function parkAutoPrompt(pos,now){
 }
 function parkAutoStart(){
   if(_pwid!==null||!navigator.geolocation) return;
-  try{ _pwid=navigator.geolocation.watchPosition(function(pos){ parkAutoFeed(pos); },function(x){ parkAutoStop(); S.parkAuto=false; save(); var e=document.getElementById("pauto"); if(e) e.checked=false; geoFail(x); },{enableHighAccuracy:true,maximumAge:5000,timeout:30000}); }catch(e){}
+  try{ _pwid=navigator.geolocation.watchPosition(function(pos){ parkAutoFeed(pos); },function(x){ parkAutoStop(); S.parkAuto=false; save(); var e=document.getElementById("pauto"); if(e) e.classList.remove("on"); geoFail(x); },{enableHighAccuracy:true,maximumAge:5000,timeout:30000}); }catch(e){}
 }
 function parkAutoStop(){ if(_pwid!==null&&navigator.geolocation){ try{ navigator.geolocation.clearWatch(_pwid); }catch(e){} } _pwid=null; PA.moveSince=0; PA.drive=false; PA.stillSince=0; PA.last=null; }
 function parkAutoToggle(on){ S.parkAuto=!!on; save(); if(on){ parkAutoStart(); toast("Détection activée : garde l’app ouverte pendant tes trajets"); } else { parkAutoStop(); toast("Détection désactivée"); } }
 document.addEventListener("visibilitychange",function(){ if(S.parkAuto){ if(document.hidden) parkAutoStop(); else parkAutoStart(); } });
 setTimeout(function(){ if(S.parkAuto&&!document.hidden) parkAutoStart(); },4000);
-function parkPhoto(el){ var f=el.files&&el.files[0]; if(!f) return; el.value=""; imgShrink(f,900,0.62).then(function(d){ if(!S.park) S.park={note:"",ts:nowLocal()}; S.park.img=d; save(); toast("Photo enregistrée"); render(); },function(){ toast("Photo illisible",true); }); }
+function parkPhoto(el){ var f=el.files&&el.files[0]; if(!f) return; el.value=""; closeSheet(); imgShrink(f,900,0.62).then(function(d){ if(!S.park) S.park={note:"",ts:nowLocal()}; S.park.img=d; save(); toast("Photo enregistrée"); render(); },function(){ toast("Photo illisible",true); }); }
 function parkShare(){
   var P=S.park; if(!P||!P.lat){ toast("Enregistre d’abord une position",true); return; }
   var url="https://maps.apple.com/?ll="+P.lat+","+P.lon+"&q="+encodeURIComponent("Ma voiture"), txt=(P.note||P.addr||"Ma voiture")+" — garée "+agoTxt(P.ts);
@@ -3051,26 +3111,39 @@ function parkTimer(){
 function parkInfoHTML(){
   var P=S.park; if(!P) return "";
   var ttl=P.note||P.addr||"Position enregistrée", sub=(P.note&&P.addr?'<div class="mut" style="font-size:13px;margin-top:2px">'+esc(P.addr)+'</div>':"");
-  return '<b style="font-size:17px">'+esc(ttl)+'</b>'+sub+'<div class="mut" style="font-size:13px;margin-top:2px">Garée '+agoTxt(P.ts)+(P.lat?" · ± "+(P.acc||"?")+" m":"")+(P.hdg!=null?" · orientée "+dirTxt(P.hdg):"")+(P.alt!=null?" · alt. "+P.alt+" m":"")+(P.auto?" · détectée automatiquement":"")+'</div>'+(P.lat&&!P.addr?'<div class="mut" style="font-size:12px;margin-top:2px">'+P.lat.toFixed(5)+', '+P.lon.toFixed(5)+'</div>':'')+(P.until?'<div style="margin-top:8px">'+parkTimer()+'</div>':'');
+  return '<b style="font-size:17px;line-height:1.25">'+esc(ttl)+'</b>'+sub+'<div class="mut" style="font-size:13px;margin-top:3px">Garée '+agoTxt(P.ts)+(P.lat&&P.acc?" · précision ± "+P.acc+" m":"")+'</div>'+(P.until?'<div style="margin-top:8px">'+parkTimer()+'</div>':'');
 }
 function parkCard(){
-  var P=S.park, has=P&&(P.lat||P.note);
-  var h='<div class="card"><div class="row sp" style="margin-bottom:12px"><h2 style="margin:0">Voiture garée</h2>'+(has?'<button class="x" aria-label="Effacer" onclick="parkClear()">'+FI.x+'</button>':'')+'</div>'+
-    '<div id="geobn" class="rtv warn" style="margin:0 0 12px;'+((_geoSt==="granted"||_geoSt==="unknown")?"display:none":"")+'"><i>'+FI.pin+'</i><div style="flex:1;min-width:0"><b>Localisation non autorisée</b><br><span class="mut" style="font-size:13px">Nécessaire pour enregistrer et retrouver la voiture.</span></div><button class="btn s" onclick="sheetGeo()">Autoriser</button></div>';
+  var P=S.park, has=P&&(P.lat||P.note), ic='<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>';
+  var h='<div class="card pkc"><div class="row sp" style="margin-bottom:12px"><h2 style="margin:0">Voiture garée</h2>'+(has&&P.auto?'<span class="ch g" style="font-size:11px">Détectée auto</span>':'')+'</div>'+
+    '<div id="geobn" class="rtv warn" style="margin:0 0 12px;'+((_geoSt==="granted"||_geoSt==="unknown")?"display:none":"")+'"><i>'+FI.pin+'</i><div style="flex:1;min-width:0"><b>Localisation non autorisée</b></div><button class="btn s" onclick="sheetGeo()">Autoriser</button></div>';
   if(has){
     var link=P.lat?"https://maps.apple.com/?daddr="+P.lat+","+P.lon+"&dirflg=w":"https://maps.apple.com/?q="+encodeURIComponent(P.note);
     h+=(P.lat?'<div class="mapbox" id="mapbox">'+mapInner()+'</div>':'<div class="pstage">'+carTopSVG(92,P.hdg)+'<b class="mpb big">P</b></div>')+
-      (P.img?'<img class="scimg" src="'+P.img+'" alt="Photo de l’emplacement" style="max-height:170px;margin-top:10px">':'')+
-      '<div id="pkinfo" style="margin-top:12px">'+parkInfoHTML()+'</div>'+
-      '<div class="row" style="margin-top:14px;gap:8px"><a class="btn p s" style="flex:1.3" href="'+link+'" target="_blank" rel="noopener">'+FI.pin+' Itinéraire à pied</a><button class="btn s" style="flex:1" onclick="parkHere()">Garée ici</button></div>'+
-      '<div class="row" style="margin-top:8px;gap:8px"><button class="btn s" style="flex:1" onclick="sheetPark()">Modifier</button><button class="btn s" style="flex:1" onclick="parkShare()">Partager</button><label class="btn s" style="flex:1;cursor:pointer" for="pk_cam">'+FI.cam+' Photo</label><input id="pk_cam" type="file" accept="image/*" capture="environment" hidden onchange="parkPhoto(this)"></div>';
+      '<div class="row pkrow" style="margin-top:14px;align-items:flex-start;gap:12px"><div id="pkinfo" style="flex:1;min-width:0">'+parkInfoHTML()+'</div>'+(P.img?'<img class="pkth" src="'+P.img+'" alt="Photo de l’emplacement" onclick="parkPhotoView()">':'')+'</div>'+
+      '<div class="pkact"><a class="btn p pkgo" href="'+link+'" target="_blank" rel="noopener">'+FI.pin+' Itinéraire à pied</a><button class="btn pkmore" aria-label="Plus d’actions" onclick="sheetParkMenu()">'+ic+'</button></div>';
   } else {
-    h+='<div class="pstage">'+carTopSVG(92,0)+'<b class="mpb big">P</b></div><div class="mut" style="margin-top:12px;line-height:1.45">Enregistre l’endroit exact où tu as garé la voiture : position GPS affinée, adresse, photo et carte pour la retrouver.</div>'+
-      '<div class="row" style="margin-top:14px;gap:8px"><button class="btn p s" style="flex:1.3" onclick="parkHere()">Je me gare ici</button><button class="btn s" style="flex:1" onclick="sheetPark()">Saisir un repère</button></div>';
+    h+='<div class="pstage">'+carTopSVG(92,0)+'<b class="mpb big">P</b></div><div class="mut" style="margin-top:12px;line-height:1.45">Enregistre l’endroit exact où tu as garé la voiture pour la retrouver avec la carte.</div>'+
+      '<div class="pkact"><button class="btn p pkgo" onclick="parkHere()">Je me gare ici</button><button class="btn pkmore" aria-label="Plus d’actions" onclick="sheetParkMenu()">'+ic+'</button></div>';
   }
-  h+='<label class="row" style="color:var(--tx);font-size:14px;margin-top:14px;align-items:flex-start;gap:10px"><input id="pauto" type="checkbox" '+(S.parkAuto?"checked":"")+' onchange="parkAutoToggle(this.checked)" style="margin-top:3px"><span style="flex:1;min-width:0">Détecter automatiquement le stationnement<small class="mut" style="display:block;font-size:12px;line-height:1.4;margin-top:2px">Propose d’enregistrer l’endroit quand tu t’arrêtes plus de 2 minutes après un trajet. Fonctionne seulement quand l’app est ouverte à l’écran.</small></span></label>';
-  h+='<label class="row" style="color:var(--tx);font-size:14px;margin-top:12px;align-items:flex-start;gap:10px"><input id="kauto" type="checkbox" '+(S.kmAuto?"checked":"")+' onchange="S.kmAuto=this.checked;save()" style="margin-top:3px"><span style="flex:1;min-width:0">Ajouter automatiquement les km au compteur<small class="mut" style="display:block;font-size:12px;line-height:1.4;margin-top:2px">À chaque nouveau stationnement, les kilomètres parcourus (tracé GPS, ou distance estimée) sont ajoutés au compteur, sans doublon avec tes saisies.</small></span></label>';
   return h+parkHistHTML()+'</div>';
+}
+function parkPhotoView(){ var P=S.park; if(!P||!P.img) return; sheet("Photo de l’emplacement",'<img src="'+P.img+'" alt="" style="width:100%;border-radius:16px;display:block">',function(){ return true; },"Fermer"); sheetFooterClose(); }
+function sheetFooterClose(){ var r=document.querySelector("#sheet .pn>.row"); if(r) r.innerHTML='<button class="btn full" onclick="closeSheet()">Fermer</button>'; }
+function swPark(id){ var el=document.getElementById(id); if(!el) return; var on=!el.classList.contains("on"); el.classList.toggle("on",on); if(id==="pauto") parkAutoToggle(on); else { S.kmAuto=on; save(); } }
+function sheetParkMenu(){
+  var P=S.park, has=P&&(P.lat||P.note);
+  var row=function(ic,t,s,fn,cls){ return '<button class="mrow '+(cls||"")+'" onclick="'+fn+'"><i>'+ic+'</i><span><b>'+t+'</b>'+(s?'<small>'+s+'</small>':'')+'</span></button>'; };
+  var body='<div class="mlist">'+
+    row(FI.pin,has?"Mettre à jour ma position":"Je me gare ici",has?"Enregistre l’endroit où tu es maintenant":"Enregistre ta position actuelle","closeSheet();parkHere()")+
+    row(FI.doc,has?"Modifier le repère":"Saisir un repère","Adresse, niveau, place, orientation, heure de fin","sheetPark()")+
+    (has?'<label class="mrow" for="pk_cam"><i>'+FI.cam+'</i><span><b>'+(P.img?"Changer la photo":"Ajouter une photo")+'</b><small>Photo de la place pour la retrouver</small></span></label><input id="pk_cam" type="file" accept="image/*" capture="environment" hidden onchange="parkPhoto(this)">':"")+
+    (has&&P.lat?row(FI.out,"Partager la position","Envoie un lien vers Plans","closeSheet();parkShare()"):"")+
+    '</div><div class="msec">Automatisation</div><div class="mlist">'+
+    '<div class="mrow swr"><span><b>Détecter le stationnement</b><small>Propose d’enregistrer quand tu t’arrêtes plus de 2 min après un trajet. L’app doit rester ouverte.</small></span><button id="pauto" class="sw'+(S.parkAuto?" on":"")+'" aria-label="Détecter le stationnement" onclick="swPark(\'pauto\')"></button></div>'+
+    '<div class="mrow swr"><span><b>Ajouter les km au compteur</b><small>À chaque nouveau stationnement, sans doublon avec tes saisies.</small></span><button id="kauto" class="sw'+(S.kmAuto?" on":"")+'" aria-label="Ajouter les km automatiquement" onclick="swPark(\'kauto\')"></button></div></div>'+
+    (has?'<div class="mlist" style="margin-top:6px">'+row(FI.x,"Effacer la position","Elle reste dans l’historique","parkClear()","dng")+'</div>':"");
+  sheet("Stationnement",body,function(){ return true; },"Fermer"); sheetFooterClose();
 }
 function sheetPark(){
   var P=S.park||{}, dirs=[["N",0],["NE",45],["E",90],["SE",135],["S",180],["SO",225],["O",270],["NO",315]];
@@ -3581,16 +3654,44 @@ function sheetFuel(){
      if(o>S.v.odo) S.v.odo=o; S.v.price=p; save(); render();
    });
 }
+var SX={mode:"EV",dt:false};
+var SX_MODES=[["EV","EV","Mode électrique : le niveau affiché est celui de la batterie. La jauge de l’app est mise à jour avec cette valeur."],["Hybride auto","Hybride","Hybride auto : le moteur peut recharger la batterie. Relevé enregistré, jauge mise à jour."],["Maintien de charge","Maintien","Maintien de charge : la batterie est conservée. Relevé enregistré, jauge mise à jour."],["Recharge","Recharge","Compté comme une recharge dans l’historique. À 99 % ou plus, il devient ton dernier 100 %."]];
+function sxColor(v){ return v<=15?"#ff5a4f":(v<=35?"#ffb340":"#3ddc84"); }
+function sxSet(val){
+  var v_=Math.max(0,Math.min(100,Math.round(val))), r=document.getElementById("f_soc"); if(r) r.value=v_;
+  var n_=document.getElementById("f_sv"); if(n_) n_.textContent=v_;
+  var f=document.getElementById("sx_fill"); if(f){ f.style.width=Math.max(v_,2)+"%"; f.style.background="linear-gradient(90deg,"+sxColor(v_)+"cc,"+sxColor(v_)+")"; f.style.boxShadow="0 0 18px "+sxColor(v_)+"88"; }
+  var big=document.getElementById("sx_big"); if(big) big.style.color=sxColor(v_);
+  var ri=rangeInfo(), ev=Math.round(v_/100*ri.ev100), last=lastSoc(), meta=[];
+  meta.push("≈ "+ev+" km en électrique");
+  if(last){ var d=v_-last.soc; meta.push((d>=0?"+":"−")+Math.abs(d)+" % depuis le relevé "+agoTxt(last.date).replace("il y a ","d’il y a ")); }
+  var m=document.getElementById("sx_meta"); if(m) m.textContent=meta.join(" · ");
+  Array.prototype.forEach.call(document.querySelectorAll(".sxq button"),function(b){ b.classList.toggle("on",+b.getAttribute("data-v")===v_); });
+}
+function sxStep(d){ sxSet((+document.getElementById("f_soc").value)+d); }
+function sxMode(i){ SX.mode=SX_MODES[i][0]; Array.prototype.forEach.call(document.querySelectorAll(".sxm button"),function(b,k){ b.classList.toggle("on",k===i); }); var c=document.getElementById("sx_cap"); if(c) c.textContent=SX_MODES[i][2]; if(i===3&&+document.getElementById("f_soc").value<80) sxSet(100); }
+function sxDt(){ SX.dt=true; var w=document.getElementById("sx_dtw"); if(w) w.style.display="block"; var b=document.getElementById("sx_dtb"); if(b) b.style.display="none"; }
 function sheetSoc(){
-  sheet("Relevé batterie hybride",
-   '<label>Niveau de charge : <b id="f_sv">60</b> %</label><input id="f_soc" type="range" min="0" max="100" value="60" oninput="document.getElementById(\'f_sv\').textContent=this.value">'+
-   '<label>Mode de conduite</label><select id="f_mode"><option>Hybride auto</option><option>Électrique</option><option>Maintien de charge</option><option>Recharge</option></select>'+
-   '<label>Autonomie carburant affichée (km), facultatif</label><input id="f_fuel" type="number" inputmode="numeric" min="0" max="1500" placeholder="ex. 350">'+
-   '<label>Date et heure</label><input id="f_date" type="datetime-local" value="'+nowLocal()+'">',
+  SX.mode="EV"; SX.dt=false; var ls=liveSoc(), init=ls?Math.round(ls.soc):60;
+  sheet("Relevé de batterie",
+   '<div class="mut" style="font-size:13.5px;margin:-4px 0 10px">Reporte le niveau affiché au tableau de bord de la voiture.</div>'+
+   '<div class="sxh"><button class="sxr" aria-label="Moins 1 %" onclick="sxStep(-1)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 12h14"/></svg></button>'+
+     '<div class="sxn" id="sx_big"><b id="f_sv">'+init+'</b><span>%</span></div>'+
+     '<button class="sxr" aria-label="Plus 1 %" onclick="sxStep(1)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button></div>'+
+   '<div class="sxbat"><i id="sx_fill"></i></div>'+
+   '<input id="f_soc" class="sxrg" type="range" min="0" max="100" value="'+init+'" oninput="sxSet(this.value)" aria-label="Niveau de charge">'+
+   '<div class="sxq">'+[20,40,60,80,100].map(function(q){ return '<button data-v="'+q+'" onclick="sxSet('+q+')">'+q+'</button>'; }).join("")+'</div>'+
+   '<div class="mut sxmeta" id="sx_meta"></div>'+
+   '<label>Mode de conduite</label><div class="sxm">'+SX_MODES.map(function(m,i){ return '<button class="'+(i===0?"on":"")+'" onclick="sxMode('+i+')">'+m[1]+'</button>'; }).join("")+'</div><div class="mut sxcap" id="sx_cap">'+SX_MODES[0][2]+'</div>'+
+   '<label>Autonomie carburant affichée <span class="mut">(facultatif)</span></label><div class="sxfu"><input id="f_fuel" type="number" inputmode="numeric" min="0" max="1500" placeholder="ex. 350"><span>km</span></div>'+
+   '<label>Date et heure</label><div class="sxdt"><span id="sx_now">Maintenant</span><button class="btn s" id="sx_dtb" onclick="sxDt()">Modifier</button></div><div id="sx_dtw" style="display:none"><input id="f_date" type="datetime-local" value="'+nowLocal()+'"></div>',
    function(){
-     var e={id:uid(),soc:parseInt(v("f_soc"),10),mode:v("f_mode"),date:v("f_date")||nowLocal()}; logOdo(S.v.odo); if(e.soc>=99) S.lastFull=e.date; var fl=parseFloat(v("f_fuel")); if(!isNaN(fl)) e.fuelKm=Math.min(1500,Math.max(0,Math.round(fl))); S.soc.push(e); if(chgOn()){ S.chg.soc0=e.soc; S.chg.t0=Date.now(); }
-     save(); render();
-   });
+     var e={id:uid(),soc:parseInt(v("f_soc"),10),mode:SX.mode,date:SX.dt?(v("f_date")||nowLocal()):nowLocal()}; logOdo(S.v.odo); if(e.soc>=99) S.lastFull=e.date;
+     var fl=parseFloat(v("f_fuel")); if(!isNaN(fl)) e.fuelKm=Math.min(1500,Math.max(0,Math.round(fl)));
+     S.soc.push(e); if(chgOn()){ S.chg.soc0=e.soc; S.chg.t0=Date.now(); }
+     save(); render(); toast("Batterie mise à jour : "+e.soc+" %");
+   },"Mettre à jour");
+  sxSet(init);
 }
 function sheetMaint(id){
   var m=S.maint.filter(function(x){return x.id===id;})[0]||{name:"",km:0,mo:12,lastKm:S.v.odo,lastDate:today(),done:true,imp:false,d:""};
