@@ -952,12 +952,15 @@ header h1 .ttl-mg{width:34px;height:34px;vertical-align:-6px;margin-right:9px}
 .wst{position:relative;margin-top:12px;display:flex;flex-direction:column}
 .wsi+.wsi{margin-top:0}
 .wst .wsi{box-shadow:0 -10px 18px -12px rgba(0,0,0,.65)}
-.wsi{position:relative;height:var(--cs,64px);overflow:hidden;border-radius:16px;transition:height .6s cubic-bezier(.2,.8,.2,1);perspective:1100px;cursor:pointer;-webkit-tap-highlight-color:transparent;-webkit-mask-image:-webkit-radial-gradient(white,black)}
+.wsi{position:relative;height:var(--cs,64px);overflow:hidden;border-radius:16px;transition:height .6s cubic-bezier(.2,.8,.2,1);cursor:pointer;-webkit-tap-highlight-color:transparent}
 .wsi.open{height:var(--ch,200px)}
-.wfl{position:absolute;left:0;right:0;top:0;height:var(--ch,200px);transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transition:transform .8s cubic-bezier(.2,.8,.2,1)}
-.wfl.fl{transform:rotateY(180deg)}
-.wff,.wfb{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:16px;overflow:hidden}
-.wfb{transform:rotateY(180deg)}
+.wfl{position:absolute;left:0;right:0;top:0;height:var(--ch,200px)}
+.wfl.fp{animation:wflp .62s cubic-bezier(.45,0,.25,1)}
+@keyframes wflp{0%{transform:scaleX(1)}50%{transform:scaleX(.03)}100%{transform:scaleX(1)}}
+.wfl.wfd .wff{opacity:0;pointer-events:none}
+.wff,.wfb{position:absolute;inset:0;border-radius:16px;overflow:hidden}
+.wfb{opacity:0;pointer-events:none}
+.wfl.wfd .wfb{opacity:1;pointer-events:auto}
 .wv{position:absolute;inset:0;border-radius:16px;overflow:hidden;color:var(--tc,#fff);background:linear-gradient(135deg,var(--c1),var(--c2));padding:14px 16px;box-sizing:border-box;line-height:1.2;text-align:left}
 .wvg{position:absolute;inset:0;background:radial-gradient(120% 80% at 100% 0%,rgba(255,255,255,.22),transparent 55%),repeating-linear-gradient(115deg,rgba(255,255,255,.05) 0 2px,transparent 2px 9px);pointer-events:none}
 .wvsh{position:absolute;inset:0;background:linear-gradient(115deg,transparent 32%,rgba(255,255,255,.2) 46%,transparent 60%);transform:translateX(-130%);animation:wlsh 7s 1.5s ease-in-out infinite;pointer-events:none}
@@ -980,6 +983,11 @@ header h1 .ttl-mg{width:34px;height:34px;vertical-align:-6px;margin-right:9px}
 .wac b{display:block;font-size:16px}
 .wac small{display:block;color:var(--mut);font-size:12.5px;margin-top:1px}
 @media (prefers-reduced-motion:reduce){.wvsh{animation:none}.wsi,.wfl{transition:none}}
+.wempty{text-align:center;padding:22px 8px 10px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.wempty b{font-size:17px}
+.wev{width:64px;height:64px;border-radius:20px;background:linear-gradient(160deg,rgba(170,130,255,.32),rgba(170,130,255,.08));border:1px solid rgba(170,130,255,.4);color:rgb(170,130,255);display:flex;align-items:center;justify-content:center}
+.wev svg{width:30px;height:30px}
+.wlvw{position:relative;aspect-ratio:1.586;border-radius:16px;overflow:hidden;box-shadow:0 14px 30px -18px rgba(0,0,0,.8)}
 .hcs{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 .hch{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:transparent;color:var(--mut);border-radius:99px;padding:6px 11px;font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .2s}
 .hch i{width:9px;height:9px;border-radius:50%;display:block;opacity:.4}
@@ -3674,7 +3682,7 @@ function parkCard(){
   return h+parkHistHTML()+'</div>';
 }
 function parkPhotoView(){ var P=S.park; if(!P||!P.img) return; sheet("Photo de l’emplacement",'<img src="'+P.img+'" alt="" style="width:100%;border-radius:16px;display:block">',function(){ return true; },"Fermer"); sheetFooterClose(); }
-function sheetFooterClose(){ var r=document.querySelector("#sheet .pn>.row"); if(r) r.innerHTML='<button class="btn full" onclick="closeSheet()">Fermer</button>'; }
+function sheetFooterClose(){ var r=document.querySelector("#sheet .pn>.row"); if(r) r.innerHTML='<button class="btn full" onclick="sheetCancel()">Fermer</button>'; }
 function swPark(id){ var el=document.getElementById(id); if(!el) return; var on=!el.classList.contains("on"); el.classList.toggle("on",on); if(id==="pauto") parkAutoToggle(on); else { S.kmAuto=on; save(); } }
 function sheetParkMenu(){
   var P=S.park, has=P&&(P.lat||P.note);
@@ -4076,9 +4084,12 @@ function vCommandes(){
   return h;
 }
 /* ---------- Feuilles de saisie ---------- */
-function sheet(title,body,ok,label){
-  $("#sheet").innerHTML='<div class="bd" onclick="closeSheet()"></div><div class="pn"><div class="grab"></div><h3>'+title+'</h3>'+body+
-    '<div class="row"><button class="btn" onclick="closeSheet()">Annuler</button><button class="btn p" id="okb">'+(label||"Enregistrer")+'</button></div></div>';
+var _sheetBack=null;
+function sheetCancel(){ var b=_sheetBack; _sheetBack=null; closeSheet(); if(b) setTimeout(b,70); }
+function sheet(title,body,ok,label,back){
+  _sheetBack=back||null;
+  $("#sheet").innerHTML='<div class="bd" onclick="sheetCancel()"></div><div class="pn"><div class="grab"></div><h3>'+title+'</h3>'+body+
+    '<div class="row"><button class="btn" onclick="sheetCancel()">Annuler</button><button class="btn p" id="okb">'+(label||"Enregistrer")+'</button></div></div>';
   $("#sheet").hidden=false; lockScroll();
   (function(){
     var pn=$("#sheet .pn"), g=$("#sheet .grab"), y0=0, dy=0;
@@ -4086,7 +4097,7 @@ function sheet(title,body,ok,label){
     g.addEventListener("touchmove",function(e){ dy=Math.max(0,e.touches[0].clientY-y0); pn.style.transform="translateY("+dy+"px)"; },{passive:true});
     g.addEventListener("touchend",function(){ pn.style.transition="transform .25s ease"; if(dy>110){ pn.style.transform="translateY(100%)"; setTimeout(closeSheet,230); } else pn.style.transform="none"; });
   })();
-  $("#okb").onclick=function(){ if(ok()!==false){ closeSheet(); if(!label||label==="Enregistrer") toast("Enregistré"); } };
+  $("#okb").onclick=function(){ if(ok()!==false){ _sheetBack=null; closeSheet(); if(!label||label==="Enregistrer") toast("Enregistré"); } };
 }
 function toast(msg,plain){
   var t=$("#toast"); t.innerHTML=(plain?"":FI.check+" ")+esc(msg); t.classList.add("on");
@@ -4094,11 +4105,10 @@ function toast(msg,plain){
 }
 /* ---------- Wallet : permis, carte grise et autres documents ---------- */
 var WT={permis:"Permis de conduire",grise:"Carte grise",autre:"Document"}, WS={id:null,side:"front",rev:false};
-var WICON='<svg viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13.5" rx="3"/><path d="M3 10h18M16.5 14.5h1.5"/></svg>';
+var WICON='<svg viewBox="0 0 24 24" width="18" height="18"><rect x="3" y="5.5" width="18" height="13.5" rx="3"/><path d="M3 10h18M16.5 14.5h1.5"/></svg>';
 function wl(){
   if(!S.wallet) S.wallet={cards:[],blur:true}; var w=S.wallet; if(!Array.isArray(w.cards)) w.cards=[];
-  if(!w.cards.some(function(c){return c.type==="permis";})) w.cards.unshift({id:uid(),type:"permis",title:WT.permis});
-  if(!w.cards.some(function(c){return c.type==="grise";})) w.cards.splice(1,0,{id:uid(),type:"grise",title:WT.grise});
+  if(!w.init){ if(!w.cards.some(function(c){return c.type==="permis";})) w.cards.unshift({id:uid(),type:"permis",title:WT.permis}); if(!w.cards.some(function(c){return c.type==="grise";})) w.cards.splice(1,0,{id:uid(),type:"grise",title:WT.grise}); w.init=true; }
   return w;
 }
 function wById(id){ return wl().cards.filter(function(c){return c.id===id;})[0]; }
@@ -4112,7 +4122,12 @@ function wSub(){ var w=wl(), f=w.cards.filter(wFilled), bad=f.some(function(c){ 
 function wPlate(){ var pl=String(S.v.plate||"").toUpperCase().replace(/[^A-Z0-9]/g,""), m=/^([A-Z]{2})(\d{3})([A-Z]{2})$/.exec(pl); return m?m[1]+"-"+m[2]+"-"+m[3]:(pl||"—"); }
 /* ---------- Wallet : cartes vectorielles façon Apple Wallet ---------- */
 var WL={open:null,flip:null}, WDEF={permis:["#12407a","#2f86e6"],grise:["#1d2240","#3e4a86"],autre:["#2b2438","#5a4672"]};
-function wCols(c){ var d=WDEF[c.type]||WDEF.autre, k=c.col&&c.col.length===2?c.col:d; return k; }
+function wRich(hex){ var m=/^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex||""); if(!m) return hex; var r=parseInt(m[1],16)/255,g=parseInt(m[2],16)/255,b=parseInt(m[3],16)/255, mx=Math.max(r,g,b), mn=Math.min(r,g,b), l=(mx+mn)/2, s=0, hh=0, d=mx-mn;
+  if(d){ s=l>0.5?d/(2-mx-mn):d/(mx+mn); if(mx===r) hh=((g-b)/d+(g<b?6:0)); else if(mx===g) hh=(b-r)/d+2; else hh=(r-g)/d+4; hh/=6; }
+  s=Math.min(1,s*1.35+0.06); l=Math.max(0.3,Math.min(0.52,l));
+  var q=l<0.5?l*(1+s):l+s-l*s, pp=2*l-q, f=function(t){ if(t<0)t+=1; if(t>1)t-=1; return t<1/6?pp+(q-pp)*6*t:(t<1/2?q:(t<2/3?pp+(q-pp)*(2/3-t)*6:pp)); };
+  var o=[f(hh+1/3),f(hh),f(hh-1/3)].map(function(v){ return Math.round(v*255).toString(16).padStart(2,"0"); }); return "#"+o.join(""); }
+function wCols(c){ var d=WDEF[c.type]||WDEF.autre; return c.col&&c.col.length===2?[wRich(c.col[0]),wRich(c.col[1])]:d; }
 function wLum(hex){ var m=/^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex||""); if(!m) return 0; return (0.299*parseInt(m[1],16)+0.587*parseInt(m[2],16)+0.114*parseInt(m[3],16))/255; }
 function wDate(c){ if(!c.exp) return ""; var d=new Date(c.exp+"T12:00"); return String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear(); }
 function wVec(c){
@@ -4125,30 +4140,137 @@ function wVec(c){
   return '<div class="wv" style="--c1:'+k[0]+';--c2:'+k[1]+';--tc:'+tx+'"><i class="wvg"></i><i class="wvsh"></i><div class="wvh"><i class="lg wvlo"></i><span>'+esc(title.toUpperCase())+'</span>'+(bad?'<em>'+(d<0?"Expiré":"Expire dans "+d+" j")+'</em>':'')+'</div><div class="wvmn">'+main+'</div><div class="wvf">'+foot+'</div></div>';
 }
 function wBack(c){
-  var img=wImg(c.id,"front"), bl=S.wallet.blur;
+  var img=wImg(c.id,"front"), bl=S.wallet.blur&&WL.rev!==c.id;
   if(img) return '<div class="wlc ph" style="border-radius:16px"><img class="'+(bl?"bl":"")+'" src="'+img+'" alt="">'+(bl?'<span class="wlx">Flouté · ouvre les détails</span>':'')+'</div>';
   return '<div class="wv wvempty" style="--c1:#2a2d38;--c2:#444a5c;--tc:#fff"><i class="wvg"></i><div class="wvmn"><div class="wvs" style="text-align:center">Aucun scan pour l’instant</div></div></div>';
+}
+/* ---------- Export : image de la carte et pass Apple Wallet ---------- */
+var WSIGN="#!/usr/bin/env bash\n# Signe un pass Apple Wallet exporté par MG iS et produit un fichier .pkpass.\n#\n# Prérequis : macOS ou Linux avec openssl, zip, python3 et curl, plus un certificat\n# « Pass Type ID » (.p12) créé dans ton compte Apple Developer.\n#\n# Usage :\n#   ./sign-pkpass.sh <dossier pass> <certificat.p12> <mot de passe .p12> <Pass Type ID> <Team ID> [sortie.pkpass]\n# Exemple :\n#   ./sign-pkpass.sh pass MonCertificat.p12 motdepasse pass.com.exemple.mgehs ABCDE12345 permis.pkpass\n#\n# Variable facultative : WWDR=/chemin/AppleWWDRCAG4.pem (sinon le certificat Apple est téléchargé).\nset -euo pipefail\n\nDIR=\"${1:?dossier du pass}\"; P12=\"${2:?certificat .p12}\"; PW=\"${3:?mot de passe du .p12}\"\nPTID=\"${4:?Pass Type ID (ex. pass.com.exemple.mgehs)}\"; TEAM=\"${5:?Team ID (10 caractères)}\"\nOUT=\"${6:-$(basename \"$DIR\").pkpass}\"\nOUT_ABS=\"$(cd \"$(dirname \"$OUT\")\" && pwd)/$(basename \"$OUT\")\"\nTMP=\"$(mktemp -d)\"; trap 'rm -rf \"$TMP\"' EXIT\nmkdir -p \"$TMP/pass\"; cp -R \"$DIR\"/. \"$TMP/pass/\"\n\n# 1) identifiants + manifest (empreintes SHA-1 de chaque fichier)\npython3 - \"$TMP/pass\" \"$PTID\" \"$TEAM\" <<'PY'\nimport sys, json, hashlib, os\nd, pt, tm = sys.argv[1:4]\np = json.load(open(d + '/pass.json', encoding='utf-8'))\np['passTypeIdentifier'] = pt\np['teamIdentifier'] = tm\njson.dump(p, open(d + '/pass.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=2)\nm = {}\nfor root, _, files in os.walk(d):\n    for f in files:\n        if f in ('manifest.json', 'signature'):\n            continue\n        fp = os.path.join(root, f)\n        m[os.path.relpath(fp, d)] = hashlib.sha1(open(fp, 'rb').read()).hexdigest()\njson.dump(m, open(d + '/manifest.json', 'w'), indent=2)\nPY\n\n# 2) certificat Apple WWDR\nWWDR=\"${WWDR:-}\"\nif [ -z \"$WWDR\" ]; then\n  curl -fsSL https://www.apple.com/certificateauthority/AppleWWDRCAG4.cer -o \"$TMP/wwdr.cer\"\n  openssl x509 -inform der -in \"$TMP/wwdr.cer\" -out \"$TMP/wwdr.pem\"\n  WWDR=\"$TMP/wwdr.pem\"\nfi\n\n# 3) extraction du certificat et de la clé (OpenSSL 3 : option -legacy pour les anciens .p12)\np12() { openssl pkcs12 -in \"$P12\" -passin \"pass:$PW\" \"$@\" 2>/dev/null || openssl pkcs12 -legacy -in \"$P12\" -passin \"pass:$PW\" \"$@\"; }\np12 -clcerts -nokeys -out \"$TMP/cert.pem\"\np12 -nocerts -passout \"pass:$PW\" -out \"$TMP/key.pem\"\n\n# 4) signature détachée du manifest\nopenssl smime -binary -sign -certfile \"$WWDR\" -signer \"$TMP/cert.pem\" -inkey \"$TMP/key.pem\" \\\n  -passin \"pass:$PW\" -in \"$TMP/pass/manifest.json\" -out \"$TMP/pass/signature\" -outform DER\n\n# 5) archive .pkpass\nrm -f \"$OUT_ABS\"\n( cd \"$TMP/pass\" && zip -q -r -X \"$OUT_ABS\" . )\necho \"OK : $OUT_ABS créé. Envoie-le sur l'iPhone (AirDrop, Mail, Fichiers) puis ouvre-le pour l'ajouter à Wallet.\"\n";
+var WFULL=false;
+function wLogoImg(){ return new Promise(function(res){ var u=getComputedStyle(document.documentElement).getPropertyValue("--logo"), m=/url\(["']?(.*?)["']?\)/.exec(u); if(!m){ res(null); return; } var im=new Image(); im.onload=function(){ res(im); }; im.onerror=function(){ res(null); }; im.src=m[1]; }); }
+function wTint(im,w,hh,color){ var cv=document.createElement("canvas"); cv.width=w; cv.height=hh; var x=cv.getContext("2d"); if(im){ var s=Math.min(w/im.width,hh/im.height), dw=im.width*s, dh=im.height*s; x.drawImage(im,(w-dw)/2,(hh-dh)/2,dw,dh); x.globalCompositeOperation="source-in"; x.fillStyle=color; x.fillRect(0,0,w,hh); } return cv; }
+function wRR(x,a,b,w,hh,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+hh,r); x.arcTo(a+w,b+hh,a,b+hh,r); x.arcTo(a,b+hh,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
+function wSp(x,t,a,b,sp,right){ var tot=0,i; for(i=0;i<t.length;i++) tot+=x.measureText(t[i]).width+sp; var px=right?a-tot:a; for(i=0;i<t.length;i++){ x.fillText(t[i],px,b); px+=x.measureText(t[i]).width+sp; } }
+function wRender(c){
+  var F='Poppins,-apple-system,"SF Pro Text",Helvetica,Arial,sans-serif';
+  return Promise.all([wLogoImg(),(document.fonts&&document.fonts.load?Promise.all([document.fonts.load("700 40px Poppins"),document.fonts.load("500 24px Poppins")]).catch(function(){}):Promise.resolve())]).then(function(r){
+    var W=1016, H=640, K=1.5, cv=document.createElement("canvas"); cv.width=W*K; cv.height=H*K; var x=cv.getContext("2d"); x.scale(K,K);
+    var k=wCols(c), dark=wLum(k[0])>0.62, tc=dark?"#10131c":"#ffffff", title=(c.type==="autre"?(c.title||"Document"):WT[c.type]);
+    wRR(x,0,0,W,H,44); x.save(); x.clip();
+    var g=x.createLinearGradient(0,0,W,H); g.addColorStop(0,k[0]); g.addColorStop(1,k[1]); x.fillStyle=g; x.fillRect(0,0,W,H);
+    var rg=x.createRadialGradient(W,0,10,W,0,W*0.85); rg.addColorStop(0,"rgba(255,255,255,.28)"); rg.addColorStop(1,"rgba(255,255,255,0)"); x.fillStyle=rg; x.fillRect(0,0,W,H);
+    x.strokeStyle="rgba(255,255,255,.055)"; x.lineWidth=5; for(var i=-H;i<W+H;i+=28){ x.beginPath(); x.moveTo(i,H); x.lineTo(i+H*0.47,0); x.stroke(); }
+    x.restore(); x.strokeStyle="rgba(255,255,255,.22)"; x.lineWidth=2; wRR(x,1,1,W-2,H-2,44); x.stroke();
+    x.drawImage(wTint(r[0],96,96,tc),52,40); x.fillStyle=tc; x.textBaseline="alphabetic"; x.font="700 27px "+F; wSp(x,title.toUpperCase(),166,104,5);
+    var vd=wDate(c), num=c.num?(WFULL?c.num:wMask(c.num)):"••••";
+    x.font="500 24px "+F; var lab=function(t,a,b,right){ x.font="500 24px "+F; x.globalAlpha=.72; x.fillStyle=tc; wSp(x,t,a,b,1,right); x.globalAlpha=1; };
+    if(c.type==="grise"){
+      var pl=wPlate(); x.font="700 84px "+F; var pw=x.measureText(pl).width+66+92; wRR(x,60,250,pw,132,16); x.fillStyle="#fff"; x.fill(); x.save(); wRR(x,60,250,pw,132,16); x.clip(); x.fillStyle="#0a3a9c"; x.fillRect(60,250,92,132); x.restore();
+      x.fillStyle="#fff"; x.font="700 40px "+F; x.fillText("F",86,332); x.fillStyle="#111"; x.font="700 84px "+F; x.fillText(pl,170,344);
+      x.fillStyle=tc; x.globalAlpha=.85; x.font="500 34px "+F; x.fillText((S.v.name||"MG EHS")+" · "+(S.v.fuel||"Hybride rechargeable"),60,438); x.globalAlpha=1;
+      lab("1ère immatriculation",60,534); x.fillStyle=tc; x.font="700 40px "+F; x.fillText(dfr(S.v.reg),60,584);
+      if(c.holder){ lab("Titulaire",W-60,534,true); x.fillStyle=tc; x.font="700 40px "+F; var tw=x.measureText(c.holder).width; x.fillText(c.holder,W-60-tw,584); }
+    } else {
+      x.fillStyle=tc; x.font="700 66px "+F; var nm=(c.holder||(c.type==="permis"?"Nom Prénom":title)).toUpperCase(); while(x.measureText(nm).width>W-120&&nm.length>4) nm=nm.slice(0,-2); x.fillText(nm,60,340);
+      x.globalAlpha=.82; x.font="500 34px "+F; x.fillText(c.type==="permis"?"Catégorie B":(c.note||""),60,396); x.globalAlpha=1;
+      lab("Numéro",60,534); x.fillStyle=tc; x.font="700 40px "+F; x.fillText(num,60,584);
+      lab("Valide jusqu’au",W-60,534,true); x.fillStyle=tc; x.font="700 40px "+F; var vt=vd||"—", vw=x.measureText(vt).width; x.fillText(vt,W-60-vw,584);
+    }
+    return cv;
+  });
+}
+function wBlob(cv){ return new Promise(function(res){ cv.toBlob(function(b){ res(b); },"image/png"); }); }
+function wShare(blob,name,title){
+  var f; try{ f=new File([blob],name,{type:blob.type}); }catch(e){ f=null; }
+  if(f&&navigator.canShare&&navigator.canShare({files:[f]})) return navigator.share({files:[f],title:title}).catch(function(){});
+  var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(function(){ a.remove(); URL.revokeObjectURL(a.href); },5000); return Promise.resolve();
+}
+function wSlug(c){ return (c.type==="autre"?(c.title||"document"):WT[c.type]).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""); }
+function wlExportPng(id){ var c=wById(id); if(!c) return; toast("Création de l’image…",true); wRender(c).then(wBlob).then(function(b){ return wShare(b,"mg-ehs-"+wSlug(c)+".png",c.type==="autre"?(c.title||"Document"):WT[c.type]); }).then(function(){ toast("Image prête"); },function(){ toast("Échec de la création de l’image",true); }); }
+/* --- archive ZIP minimale (sans compression) --- */
+var _crcT=null;
+function crc32(u){ if(!_crcT){ _crcT=new Uint32Array(256); for(var n=0;n<256;n++){ var c=n; for(var k=0;k<8;k++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1); _crcT[n]=c>>>0; } } var c2=0xFFFFFFFF; for(var i=0;i<u.length;i++) c2=_crcT[(c2^u[i])&255]^(c2>>>8); return (c2^0xFFFFFFFF)>>>0; }
+function wZip(files){
+  var enc=new TextEncoder(), parts=[], cd=[], off=0, now=new Date(), dt=(((now.getFullYear()-1980)<<9)|((now.getMonth()+1)<<5)|now.getDate()), tm=((now.getHours()<<11)|(now.getMinutes()<<5)|(now.getSeconds()>>1));
+  files.forEach(function(f){ var nm=enc.encode(f.name), crc=crc32(f.data), sz=f.data.length, lh=new DataView(new ArrayBuffer(30));
+    lh.setUint32(0,0x04034b50,true); lh.setUint16(4,20,true); lh.setUint16(6,0x0800,true); lh.setUint16(8,0,true); lh.setUint16(10,tm,true); lh.setUint16(12,dt,true); lh.setUint32(14,crc,true); lh.setUint32(18,sz,true); lh.setUint32(22,sz,true); lh.setUint16(26,nm.length,true);
+    parts.push(new Uint8Array(lh.buffer),nm,f.data);
+    var ch=new DataView(new ArrayBuffer(46)); ch.setUint32(0,0x02014b50,true); ch.setUint16(4,20,true); ch.setUint16(6,20,true); ch.setUint16(8,0x0800,true); ch.setUint16(12,tm,true); ch.setUint16(14,dt,true); ch.setUint32(16,crc,true); ch.setUint32(20,sz,true); ch.setUint32(24,sz,true); ch.setUint16(28,nm.length,true); ch.setUint32(42,off,true);
+    cd.push(new Uint8Array(ch.buffer),nm); off+=30+nm.length+sz; });
+  var cds=cd.reduce(function(a,b){ return a+b.length; },0), end=new DataView(new ArrayBuffer(22)); end.setUint32(0,0x06054b50,true); end.setUint16(8,files.length,true); end.setUint16(10,files.length,true); end.setUint32(12,cds,true); end.setUint32(16,off,true);
+  var all=parts.concat(cd,[new Uint8Array(end.buffer)]), len=all.reduce(function(a,b){ return a+b.length; },0), out=new Uint8Array(len), p=0; all.forEach(function(b){ out.set(b,p); p+=b.length; }); return out;
+}
+function wRGB(hex){ var m=/^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex||""); return m?"rgb("+parseInt(m[1],16)+", "+parseInt(m[2],16)+", "+parseInt(m[3],16)+")":"rgb(30, 40, 80)"; }
+function wPassJSON(c){
+  var k=wCols(c), dark=wLum(k[0])>0.62, title=(c.type==="autre"?(c.title||"Document"):WT[c.type]), vd=wDate(c), num=c.num?(WFULL?c.num:wMask(c.num)):"";
+  var P={formatVersion:1,passTypeIdentifier:"REMPLACER_PASS_TYPE_ID",teamIdentifier:"REMPLACER_TEAM_ID",serialNumber:"mgehs-"+c.id,organizationName:"MG EHS",description:title,logoText:"MG EHS",
+    foregroundColor:dark?"rgb(16, 19, 28)":"rgb(255, 255, 255)",labelColor:dark?"rgb(60, 66, 90)":"rgb(214, 222, 255)",backgroundColor:wRGB(k[0]),generic:{primaryFields:[],secondaryFields:[],auxiliaryFields:[],backFields:[]}};
+  var G=P.generic, add=function(arr,key,label,val){ if(val) G[arr].push({key:key,label:label,value:String(val)}); };
+  if(c.type==="grise"){ add("primaryFields","plate","IMMATRICULATION",wPlate()); add("secondaryFields","veh","VÉHICULE",(S.v.name||"MG EHS")); add("secondaryFields","reg","1ÈRE IMMATRICULATION",dfr(S.v.reg)); add("auxiliaryFields","holder","TITULAIRE",c.holder); }
+  else { add("primaryFields","holder",c.type==="permis"?"TITULAIRE":"DOCUMENT",c.holder||title); if(c.type==="permis") add("secondaryFields","cat","CATÉGORIE","B"); add("secondaryFields","exp","VALIDITÉ",vd); add("auxiliaryFields","num","NUMÉRO",num); }
+  if(c.exp) P.expirationDate=c.exp+"T12:00:00Z";
+  if(c.note) G.backFields.push({key:"note",label:"Note",value:c.note});
+  G.backFields.push({key:"about",label:"Créé avec",value:"MG iS · données conservées sur l’appareil"});
+  return JSON.stringify(P,null,2);
+}
+function wPassIcon(im,size,bg,fg){ var cv=document.createElement("canvas"); cv.width=cv.height=size; var x=cv.getContext("2d"); wRR(x,0,0,size,size,size*0.22); x.fillStyle=bg; x.fill(); x.drawImage(wTint(im,size*0.7,size*0.7,fg),size*0.15,size*0.15); return cv; }
+function wPassFiles(c){
+  return wLogoImg().then(function(im){
+    var k=wCols(c), dark=wLum(k[0])>0.62, fg=dark?"#10131c":"#ffffff", enc=new TextEncoder(), files=[], jobs=[];
+    files.push({name:"pass/pass.json",data:enc.encode(wPassJSON(c))});
+    [[29,""],[58,"@2x"],[87,"@3x"]].forEach(function(s){ jobs.push(wBlob(wPassIcon(im,s[0],k[0],fg)).then(function(b){ return b.arrayBuffer(); }).then(function(a){ files.push({name:"pass/icon"+s[1]+".png",data:new Uint8Array(a)}); })); });
+    [[50,""],[100,"@2x"],[150,"@3x"]].forEach(function(s){ jobs.push(wBlob(wTint(im,s[0],s[0],fg)).then(function(b){ return b.arrayBuffer(); }).then(function(a){ files.push({name:"pass/logo"+s[1]+".png",data:new Uint8Array(a)}); })); });
+    return Promise.all(jobs).then(function(){ return files; });
+  });
+}
+function wReadme(c){ return ["PASS APPLE WALLET À SIGNER — MG iS","",
+"Ce dossier « pass » contient un pass Apple Wallet (pass.json + images) pour : "+(c.type==="autre"?(c.title||"Document"):WT[c.type])+".",
+"Apple n’ajoute dans Wallet que des passes SIGNÉS avec un certificat « Pass Type ID » de ton compte Apple Developer. Le fichier n’est donc pas encore utilisable tel quel.","",
+"1) Dans ton compte Apple Developer : Identifiers > Pass Type IDs > crée un identifiant (ex. pass.com.tonnom.mgehs), puis crée son certificat et exporte-le en .p12 depuis Trousseau d’accès.",
+"2) Sur un Mac (ou Linux avec openssl, zip, python3, curl), dans ce dossier :",
+"   chmod +x sign-pkpass.sh",
+"   ./sign-pkpass.sh pass MonCertificat.p12 MOT_DE_PASSE pass.com.tonnom.mgehs TON_TEAM_ID "+wSlug(c)+".pkpass",
+"3) Envoie le fichier .pkpass sur l’iPhone (AirDrop, Mail ou Fichiers), ouvre-le et touche « Ajouter ».","",
+"Remarques : le pass contient seulement les informations saisies (numéro masqué par défaut). Les scans ne sont pas inclus.",
+"Wallet n’accepte pas de simple image : sans compte Apple Developer, utilise plutôt l’image PNG de la carte (Photos ou Fichiers)."].join("\n"); }
+function wlExportPass(id){
+  var c=wById(id); if(!c) return; toast("Préparation du pass…",true);
+  wPassFiles(c).then(function(files){ var enc=new TextEncoder(); files.push({name:"sign-pkpass.sh",data:enc.encode(WSIGN)}); files.push({name:"LISEZ-MOI.txt",data:enc.encode(wReadme(c))}); files.sort(function(a,b){ return a.name<b.name?-1:1; });
+    var zip=wZip(files); return wShare(new Blob([zip],{type:"application/zip"}),"mg-ehs-"+wSlug(c)+"-pass-a-signer.zip","Pass Apple Wallet à signer"); }).then(function(){ toast("Archive prête : suis LISEZ-MOI.txt pour signer"); },function(){ toast("Échec de la création du pass",true); });
+}
+function wlExport(id){
+  var c=wById(id); if(!c) return;
+  var row=function(ic,t,s,fn){ return '<button class="pmr" onclick="'+fn+'"><i>'+ic+'</i><span><b>'+t+'</b>'+(s?'<small>'+s+'</small>':'')+'</span></button>'; };
+  sheet("Exporter",'<div class="wlvw" style="margin-bottom:12px">'+wVec(c)+'</div>'+
+    '<div class="mlist">'+row(FI.doc,"Image de la carte","PNG haute définition : enregistre-la dans Photos ou Fichiers","wlExportPng('"+id+"')")+row(WICON,"Pass Apple Wallet (.pkpass)","Archive à signer avec ton compte Apple Developer","wlExportPass('"+id+"')")+'</div>'+
+    '<div class="pmr swr" style="margin-top:8px"><span><b>Inclure le numéro complet</b><small>Par défaut seuls les 4 derniers chiffres sont exportés.</small></span><button class="sw'+(WFULL?" on":"")+'" aria-label="Numéro complet" onclick="WFULL=!WFULL;this.classList.toggle(\'on\',WFULL)"></button></div>'+
+    '<div class="mut" style="font-size:12.5px;line-height:1.5;margin-top:10px">Apple Wallet n’accepte que des passes signés avec un certificat Apple Developer. L’app prépare donc le pass et un script de signature ; les scans ne sont jamais inclus.</div>',function(){ return true; },"Fermer",function(){ sheetWallet(); }); sheetFooterClose();
 }
 function wlSize(){ var st=document.getElementById("wst"); if(!st) return; var w=st.clientWidth||320; st.style.setProperty("--ch",Math.round(w/1.586)+"px"); st.style.setProperty("--cs","64px"); }
 function wlPick(id){
   var open=(WL.open===id);
-  if(!open){ WL.open=id; WL.flip=null; } else { WL.flip=(WL.flip===id?null:id); }
-  Array.prototype.forEach.call(document.querySelectorAll("#wst .wsi"),function(el){ var me=el.getAttribute("data-id")===id; el.classList.toggle("open",el.getAttribute("data-id")===WL.open); var f=el.querySelector(".wfl"); if(f) f.classList.toggle("fl",el.getAttribute("data-id")===WL.flip); });
+  var flipping=open; if(!open){ WL.open=id; WL.flip=null; } else { WL.flip=(WL.flip===id?null:id); }
+  Array.prototype.forEach.call(document.querySelectorAll("#wst .wsi"),function(el){ var me=el.getAttribute("data-id")===id; el.classList.toggle("open",el.getAttribute("data-id")===WL.open); var f=el.querySelector(".wfl"); if(!f) return; var want=el.getAttribute("data-id")===WL.flip;
+    if(me&&flipping&&!calmOn()){ f.classList.remove("fp"); void f.offsetWidth; f.classList.add("fp"); setTimeout(function(){ f.classList.toggle("wfd",want); },300); setTimeout(function(){ f.classList.remove("fp"); },680); } else f.classList.toggle("wfd",want); });
   var c=wById(WL.open), a=document.getElementById("wact"); if(a&&c) a.innerHTML=wActHTML(c);
 }
 function wScanLabel(c){ return !wImg(c.id,"front")?"Scanner le recto":(!wImg(c.id,"back")?"Scanner le verso":"Scanner à nouveau"); }
 function wActHTML(c){
+  if(!c) return "";
   var wd=wValid(c), id=c.id;
-  return '<div class="wac"><div style="min-width:0"><b>'+esc(c.type==="autre"?(c.title||"Document"):WT[c.type])+'</b><small>'+(wd||(wFilled(c)?"Informations enregistrées":"À compléter : scanne la carte et saisis les informations"))+'</small></div></div>'+
+  return '<div class="wac"><div style="min-width:0"><b>'+esc(c.type==="autre"?(c.title||"Document"):WT[c.type])+'</b><small>'+(wd||((c.holder||c.num||c.exp)?"Informations enregistrées":(wImg(c.id,"front")?"Scan enregistré · touche Modifier pour saisir les informations":"À compléter : scanne la carte et saisis les informations")))+'</small></div></div>'+
     '<button class="btn p full" style="margin-top:10px" onclick="wlScan(\''+id+'\')">'+FI.cam+' '+wScanLabel(c)+'</button>'+
-    '<div class="row" style="gap:8px;margin-top:8px"><button class="btn s" style="flex:1" onclick="wlEdit(\''+id+'\')">'+FI.doc+' Modifier</button><button class="btn s" style="flex:1" onclick="wlDetails(\''+id+'\')">Détails et scans</button></div>';
+    '<div class="row" style="gap:8px;margin-top:8px"><button class="btn s" style="flex:1" onclick="wlEdit(\''+id+'\')">'+FI.doc+' Modifier</button><button class="btn s" style="flex:1" onclick="wlDetails(\''+id+'\')">Détails et scans</button></div>'+
+    '<button class="btn s full" style="margin-top:8px" onclick="wlExport(\''+id+'\')">'+WICON+' Exporter · Apple Wallet</button><div class="row" style="gap:8px;margin-top:8px">'+(wImg(id,"front")?'<button class="btn s" style="flex:1" onclick="wlPick(\''+id+'\')">Retourner la carte</button>':'')+'<button class="btn s" style="flex:1;color:var(--bad)" onclick="wlDelete(\''+id+'\')">'+FI.x+' Supprimer</button></div>';
 }
 function wlScan(id){ var c=wById(id); if(!c) return; var f=document.getElementById("wl_f"); if(!f){ toast("Ouvre d’abord le Wallet",true); return; } WS.ret="wallet"; WL.open=id; var side=!wImg(id,"front")?"front":(!wImg(id,"back")?"back":"front"); f.setAttribute("data-s",side); f.click(); }
 function wlEdit(id){ WS.ret="wallet"; WL.open=id; sheetWalletEdit(id); }
-function wlDetails(id){ WL.flip=null; WS.ret=""; WS.rev=false; WS.side="front"; sheetWalletCard(id); }
+function wlDetails(id){ WL.flip=null; WS.ret=""; WS.from="wallet"; WS.rev=false; WS.side="front"; sheetWalletCard(id); }
+function walletOpen(){ WL.flip=null; WL.rev=null; WS.ret=""; WS.from=""; sheetWallet(); }
 function sheetWallet(){
-  var w=wl(); if(!WL.open||!wById(WL.open)) WL.open=w.cards[0].id;
-  var st=w.cards.map(function(c,i){ return '<div class="wsi'+(WL.open===c.id?" open":"")+'" data-id="'+c.id+'" style="z-index:'+(i+1)+'" onclick="wlPick(\''+c.id+'\')"><div class="wfl'+(WL.flip===c.id?" fl":"")+'"><div class="wff">'+wVec(c)+'</div><div class="wfb">'+wBack(c)+'</div></div></div>'; }).join("");
+  var w=wl(); if(!w.cards.length){ sheet("Wallet",'<div class="wempty"><div class="wev">'+WICON+'</div><b>Ton Wallet est vide</b><div class="mut" style="font-size:13.5px;line-height:1.45">Ajoute ton permis, ta carte grise ou un autre document du véhicule.</div></div><button class="btn p full" style="margin-top:6px" onclick="walletAddOther()">'+FI.plus+' Ajouter une carte</button>',function(){ return true; },"Fermer"); sheetFooterClose(); return; }
+  if(!WL.open||!wById(WL.open)) WL.open=w.cards[0].id;
+  var st=w.cards.map(function(c,i){ return '<div class="wsi'+(WL.open===c.id?" open":"")+'" data-id="'+c.id+'" style="z-index:'+(i+1)+'" onclick="wlPick(\''+c.id+'\')"><div class="wfl'+(WL.flip===c.id?" wfd":"")+'"><div class="wff">'+wVec(c)+'</div><div class="wfb">'+wBack(c)+'</div></div></div>'; }).join("");
   sheet("Wallet",'<div class="mut" style="font-size:13.5px;margin:-4px 0 4px;line-height:1.45">Tes documents du véhicule. Touche une carte pour l’ouvrir, touche-la encore pour voir le scan.</div><div class="wst" id="wst">'+st+'</div><div id="wact">'+wActHTML(wById(WL.open))+'</div><input id="wl_f" type="file" accept="image/*" hidden onchange="walletPhoto(WL.open,this.getAttribute(\'data-s\'),this)">'+
     '<button class="btn s full" style="margin-top:12px" onclick="walletAddOther()">'+FI.plus+' Ajouter un document</button>'+
     '<div class="pmr swr" style="margin-top:6px"><span><b>Flouter les scans</b><small>Les photos ne s’affichent qu’au toucher.</small></span><button class="sw'+(w.blur?" on":"")+'" aria-label="Flouter les scans" onclick="walletBlur(this)"></button></div>'+
@@ -4181,14 +4303,14 @@ function sheetWalletCard(id){
   var info=function(l,v){ return v?'<div class="wli"><span>'+l+'</span><b>'+v+'</b></div>':''; };
   var num=c.num?(WS.rev?esc(c.num):wMask(c.num)):"";
   var body=((hasF||hasB)?'<div class="seg sm" style="margin:0 0 12px"><button class="'+(side==="front"?"on":"")+'" onclick="WS.side=\'front\';sheetWalletCard(\''+id+'\')">Recto</button><button class="'+(side==="back"?"on":"")+'" onclick="WS.side=\'back\';sheetWalletCard(\''+id+'\')"'+(hasB?'':' disabled style="opacity:.4"')+'>Verso</button></div>':'')+
-    '<div class="wlbig" '+(bl?'onclick="WS.rev=true;sheetWalletCard(\''+id+'\')"':'')+'>'+(img?wFace(c,{side:side,reveal:WS.rev,hint:true}):wVec(c))+'</div>'+
+    '<div class="wlbig" '+(bl?'onclick="WS.rev=true;sheetWalletCard(\''+id+'\')"':'')+'>'+(img?wFace(c,{side:side,reveal:WS.rev,hint:true}):'<div class="wlvw">'+wVec(c)+'</div>')+'</div>'+
     '<div class="wlis">'+info("Titulaire",esc(c.holder||""))+info("Numéro",num+(c.num?' <button class="wleye" onclick="WS.rev=!WS.rev;sheetWalletCard(\''+id+'\')" aria-label="Afficher ou masquer">'+(WS.rev?"Masquer":"Afficher")+'</button>':""))+info("Validité",esc(wValid(c)))+info("Note",esc(c.note||""))+'</div>'+fi+
     '<div class="mlist" style="margin-top:8px">'+
     row(FI.cam,hasF?"Scanner à nouveau le recto":"Scanner le recto","Recadrage et correction automatiques","walletPick('front')")+
     row(FI.cam,hasB?"Scanner à nouveau le verso":"Scanner le verso",hasF&&!hasB?"Il manque le verso : retourne la carte":"","walletPick('back')",(WS.hint==="back"&&!hasB)?"wlpulse":"")+
     row(FI.doc,"Modifier les informations","Titulaire, numéro, date de validité, note","sheetWalletEdit('"+id+"')")+
-    ((hasF||hasB||c.type==="autre"||wFilled(c))?row(FI.x,c.type==="autre"?"Supprimer ce document":"Effacer photos et informations","Les données de ce document sont supprimées de l’appareil","walletClear('"+id+"')","dng"):"")+'</div>';
-  sheet(c.type==="autre"?(c.title||"Document"):WT[c.type],body,function(){ return true; },"Fermer"); sheetFooterClose(); WS.hint="";
+    row(FI.x,"Supprimer cette carte","La carte, ses informations et ses scans sont supprimés de l’appareil","wlDelete('"+id+"')","dng")+'</div>';
+  sheet(c.type==="autre"?(c.title||"Document"):WT[c.type],body,function(){ return true; },"Fermer",WS.from==="wallet"?function(){ sheetWallet(); }:null); sheetFooterClose(); WS.hint="";
 }
 function walletPick(side){ var f=document.getElementById("wl_f"); if(!f) return; f.setAttribute("data-s",side); f.click(); }
 /* ---------- Scanner de carte : détection, redressement, amélioration (100 % local) ---------- */
@@ -4275,7 +4397,7 @@ function scStep1(){
     '<div class="scs" id="scs" style="aspect-ratio:'+W+'/'+H+'"><img src="'+url+'" alt=""><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none"><polygon id="scpoly" points="'+SC.q.map(function(p){return p[0].toFixed(0)+","+p[1].toFixed(0);}).join(" ")+'"/>'+SC.q.map(function(p,i){ return '<circle class="sch" data-i="'+i+'" cx="'+p[0].toFixed(0)+'" cy="'+p[1].toFixed(0)+'" r="'+r.toFixed(0)+'"/>'; }).join("")+'</svg></div>'+
     '<div class="row" style="gap:8px;margin-top:10px"><button class="btn s" style="flex:1" onclick="scReset()">Détection auto</button></div>'+
     '<div class="mut" style="font-size:12px;margin-top:8px;line-height:1.45">Astuce : pose la carte sur un fond uni plus sombre, bien éclairée, sans reflet.</div>';
-  sheet("Scanner le "+(SC.side==="back"?"verso":"recto"),body,function(){ setTimeout(scStep2,60); return false; },"Valider");
+  sheet("Scanner le "+(SC.side==="back"?"verso":"recto"),body,function(){ setTimeout(scStep2,60); return false; },"Valider",function(){ if(WS.ret==="wallet"){ WS.ret=""; sheetWallet(); } else sheetWalletCard(SC.id); });
   scBind();
 }
 function scReset(){ var det=scDetect(SC.cv); SC.q=det.q; SC.auto=det.ok; scStep1(); }
@@ -4297,12 +4419,12 @@ function scStep2(){
     '<div class="row" style="gap:6px;flex-wrap:wrap;margin-top:10px">'+chip(sharpOk,sharpOk?"Net":"Plutôt flou")+chip(glareOk,glareOk?"Sans reflet":"Reflets")+chip(true,"Format carte")+'</div>'+
     ((sharpOk&&glareOk)?'':'<div class="mut" style="font-size:12.5px;line-height:1.45;margin-top:8px">Pour un meilleur résultat : plus de lumière, évite les reflets et tiens l’iPhone bien stable.</div>')+
     '<div class="row" style="gap:8px;margin-top:12px"><button class="btn s" style="flex:1" onclick="SC.rot=(SC.rot+1)%4;SC.rotSet=true;scStep2()">Pivoter</button><button class="btn s" style="flex:1" onclick="SC.rotSet=false;scStep1()">Recadrer</button></div>';
-  sheet("Résultat · "+(SC.side==="back"?"verso":"recto"),body,function(){ return scSave(); },"Enregistrer");
+  sheet("Résultat · "+(SC.side==="back"?"verso":"recto"),body,function(){ return scSave(); },"Enregistrer",function(){ if(WS.ret==="wallet"){ WS.ret=""; sheetWallet(); } else sheetWalletCard(SC.id); });
 }
 function scSave(){
   var url=SC.out.toDataURL("image/jpeg",0.86), id=SC.id, side=SC.side;
   if(!wImgSet(id,side,url)){ url=SC.out.toDataURL("image/jpeg",0.7); if(!wImgSet(id,side,url)){ toast("Espace de stockage insuffisant : carte non enregistrée",true); return false; } }
-  var c=wById(id); if(c&&!c.t0) c.t0=nowLocal(); if(c&&side==="front"){ var cc=scColors(SC.out); if(cc) c.col=cc; } save(); WS.side=side; WS.rev=true; SC.cv=null; SC.out=null; SC.rotSet=false; toast(side==="front"&&!wImg(id,"back")?"Recto enregistré · scanne maintenant le verso":"Carte numérisée"); WS.hint=(side==="front"&&!wImg(id,"back"))?"back":""; render(); setTimeout(function(){ if(c&&!c.holder&&!c.num) sheetWalletEdit(id,true); else if(WS.ret==="wallet"){ WS.ret=""; WL.open=id; sheetWallet(); } else sheetWalletCard(id); },340); return true;
+  var c=wById(id); if(c&&!c.t0) c.t0=nowLocal(); if(c&&side==="front"){ var cc=scColors(SC.out); if(cc) c.col=cc; } save(); WS.side=side; WS.rev=true; WL.open=id; WL.flip=id; WL.rev=id; SC.cv=null; SC.out=null; SC.rotSet=false; toast(side==="front"&&!wImg(id,"back")?"Recto enregistré · scanne maintenant le verso":"Carte numérisée"); WS.hint=(side==="front"&&!wImg(id,"back"))?"back":""; render(); setTimeout(function(){ if(c&&!c.holder&&!c.num) sheetWalletEdit(id,true); else if(WS.ret==="wallet"){ WS.ret=""; WL.open=id; sheetWallet(); } else sheetWalletCard(id); },340); return true;
 }
 function sheetWalletEdit(id,intro){
   var c=wById(id); if(!c) return;
@@ -4312,16 +4434,25 @@ function sheetWalletEdit(id,intro){
     '<label>Numéro</label><input id="w_num" value="'+esc(c.num||"")+'" placeholder="'+(c.type==="grise"?"Numéro de formule (facultatif)":"Numéro du permis (facultatif)")+'" autocomplete="off">'+
     '<label>Date de validité (facultatif)</label><input id="w_exp" type="date" value="'+esc(c.exp||"")+'">'+
     '<label>Note</label><input id="w_note" value="'+esc(c.note||"")+'" placeholder="ex. Rappel de renouvellement">',
-    function(){ if(c.type==="autre"){ c.title=v("w_title").trim()||"Document"; } c.holder=v("w_holder").trim(); c.num=v("w_num").trim(); c.exp=v("w_exp"); c.note=v("w_note").trim(); save(); render(); setTimeout(function(){ if(WS.ret==="wallet"){ WS.ret=""; WL.open=id; sheetWallet(); } else sheetWalletCard(id); },340); return true; },"Enregistrer");
+    function(){ if(c.type==="autre"){ c.title=v("w_title").trim()||"Document"; } c.holder=v("w_holder").trim(); c.num=v("w_num").trim(); c.exp=v("w_exp"); c.note=v("w_note").trim(); save(); render(); setTimeout(function(){ if(WS.ret==="wallet"){ WS.ret=""; WL.open=id; sheetWallet(); } else sheetWalletCard(id); },340); return true; },"Enregistrer",function(){ if(WS.ret==="wallet"){ WS.ret=""; WL.open=id; sheetWallet(); } else sheetWalletCard(id); });
 }
-function walletAddOther(){ var w=wl(), c={id:uid(),type:"autre",title:"Document"}; w.cards.push(c); save(); sheetWalletEdit(c.id); }
-function walletClear(id){
-  var c=wById(id); if(!c) return;
-  ask(c.type==="autre"?"Supprimer ce document et ses photos ?":"Effacer les photos et informations de ce document ?",function(){
-    wImgSet(id,"front",""); wImgSet(id,"back","");
-    if(c.type==="autre") S.wallet.cards=S.wallet.cards.filter(function(x){return x.id!==id;}); else { c.holder=c.num=c.exp=c.note=""; delete c.t0; }
-    save(); render(); setTimeout(sheetWallet,340); toast("Document effacé",true);
-  },"Effacer");
+function walletAddOther(){
+  var w=wl(), has=function(t){ return w.cards.some(function(c){return c.type===t;}); };
+  var row=function(ic,t,s,fn){ return '<button class="pmr" onclick="'+fn+'"><i>'+ic+'</i><span><b>'+t+'</b>'+(s?'<small>'+s+'</small>':'')+'</span></button>'; };
+  sheet("Ajouter une carte",'<div class="mlist">'+row(FI.doc,"Permis de conduire",has("permis")?"Déjà dans ton Wallet":"","walletNew('permis')")+row(FI.doc,"Carte grise",has("grise")?"Déjà dans ton Wallet":"","walletNew('grise')")+row(FI.plus,"Autre document","Assurance, contrôle technique, carte verte…","walletNew('autre')")+'</div>',function(){ return true; },"Fermer",function(){ sheetWallet(); }); sheetFooterClose();
+}
+function walletNew(t){
+  var w=wl(), ex=w.cards.filter(function(c){return c.type===t;})[0];
+  if(t!=="autre"&&ex){ WL.open=ex.id; sheetWallet(); return; }
+  var c={id:uid(),type:t,title:t==="autre"?"Document":WT[t]}; w.cards.push(c); save(); WL.open=c.id; WS.ret="wallet";
+  if(t==="autre") sheetWalletEdit(c.id); else { render(); sheetWallet(); }
+}
+function walletClear(id){ wlDelete(id); }
+function wlDelete(id){
+  var c=wById(id); if(!c) return; var nm=c.type==="autre"?(c.title||"Document"):WT[c.type];
+  ask("Supprimer « "+nm+" » ? La carte, ses informations et ses scans sont effacés de cet appareil.",function(){
+    wImgSet(id,"front",""); wImgSet(id,"back",""); var w=wl(); w.cards=w.cards.filter(function(x){return x.id!==id;}); if(WL.open===id) WL.open=null; WL.flip=null; WS.ret=""; save(); render(); toast("Carte supprimée",true); setTimeout(sheetWallet,340);
+  },"Supprimer");
 }
 function walletWipe(){ try{ Object.keys(localStorage).forEach(function(k){ if(k.indexOf("mg-w-")===0) localStorage.removeItem(k); }); }catch(e){} }
 function quick(){
@@ -4330,7 +4461,7 @@ function quick(){
   var nb=ml.filter(function(x){return x.st==="bad";}).length, nu=ml.filter(function(x){return x.unk;}).length;
   var tile=function(tc,fn,icon,lab,sub,warn){ return '<button class="qt" style="--tc:'+tc+'" onclick="'+fn+'"><i>'+icon+'</i><b>'+lab+'</b><small'+(warn?' class="w"':'')+'>'+sub+'</small></button>'; };
   return '<div class="qa">'+
-    tile("170,130,255","sheetWallet()",WICON,"Wallet",wSub().txt,wSub().warn)+
+    tile("170,130,255","walletOpen()",WICON,"Wallet",wSub().txt,wSub().warn)+
     tile("61,220,132","sheetSoc()",IC.batterie,"Batterie",s?s.soc+" %":"Relever")+
     tile("76,195,255","sheetOdo()",ic,"Km",S.v.odo?n(S.v.odo,0)+" km":"Saisir")+
     tile("var(--ar,200,16,46)","go('entretien')",IC.entretien,"Entretien",nb?nb+" en retard":(nu?nu+" à voir":"À jour"),!!nb)+

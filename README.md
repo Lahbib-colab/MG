@@ -18,6 +18,11 @@ Safari > bouton Partager > « Sur l'écran d'accueil ». L'app s'ouvre en plein 
 - Le HTTPS est requis pour la localisation et le mode hors ligne (GitHub Pages le fournit).
 - Pour publier une mise à jour, remplace `index.html` et change `mg-ehs-v3` en `mg-ehs-v4` dans `sw.js`.
 
+## Wallet : export vers Apple Wallet
+- `Exporter · Apple Wallet` (dans le Wallet de l'app) propose l'**image PNG** de la carte (Photos / Fichiers) ou une **archive de pass à signer**.
+- Apple n'ajoute dans Wallet que des passes `.pkpass` **signés** avec un certificat « Pass Type ID » de ton compte Apple Developer. Le script `scripts/sign-pkpass.sh` (openssl, zip, python3, curl) crée manifest + signature + `.pkpass` ; la procédure est aussi dans le `LISEZ-MOI.txt` de l'archive exportée.
+- Les scans de documents ne sont jamais inclus dans le pass ; le numéro est masqué sauf si tu l'actives.
+
 ## Lecture des factures (100 % locale)
 - **PDF avec texte** : lus directement par l'app (lecteur PDF embarqué + lecture directe en secours). Rien à installer.
 - **Photos et PDF scannés** : nécessitent le moteur de lecture optique, à installer une seule fois :
