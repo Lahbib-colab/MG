@@ -4136,14 +4136,20 @@ function wlPick(id){
   Array.prototype.forEach.call(document.querySelectorAll("#wst .wsi"),function(el){ var me=el.getAttribute("data-id")===id; el.classList.toggle("open",el.getAttribute("data-id")===WL.open); var f=el.querySelector(".wfl"); if(f) f.classList.toggle("fl",el.getAttribute("data-id")===WL.flip); });
   var c=wById(WL.open), a=document.getElementById("wact"); if(a&&c) a.innerHTML=wActHTML(c);
 }
+function wScanLabel(c){ return !wImg(c.id,"front")?"Scanner le recto":(!wImg(c.id,"back")?"Scanner le verso":"Scanner à nouveau"); }
 function wActHTML(c){
-  var d=wDays(c), wd=wValid(c);
-  return '<div class="wac"><div style="min-width:0"><b>'+esc(c.type==="autre"?(c.title||"Document"):WT[c.type])+'</b><small>'+(wd||(wFilled(c)?"Informations enregistrées":"À compléter"))+'</small></div><div class="row" style="gap:8px"><button class="btn s" onclick="WL.flip=null;WS.rev=false;WS.side=\'front\';sheetWalletCard(\''+c.id+'\')">Détails</button></div></div>';
+  var wd=wValid(c), id=c.id;
+  return '<div class="wac"><div style="min-width:0"><b>'+esc(c.type==="autre"?(c.title||"Document"):WT[c.type])+'</b><small>'+(wd||(wFilled(c)?"Informations enregistrées":"À compléter : scanne la carte et saisis les informations"))+'</small></div></div>'+
+    '<button class="btn p full" style="margin-top:10px" onclick="wlScan(\''+id+'\')">'+FI.cam+' '+wScanLabel(c)+'</button>'+
+    '<div class="row" style="gap:8px;margin-top:8px"><button class="btn s" style="flex:1" onclick="wlEdit(\''+id+'\')">'+FI.doc+' Modifier</button><button class="btn s" style="flex:1" onclick="wlDetails(\''+id+'\')">Détails et scans</button></div>';
 }
+function wlScan(id){ var c=wById(id); if(!c) return; var f=document.getElementById("wl_f"); if(!f){ toast("Ouvre d’abord le Wallet",true); return; } WS.ret="wallet"; WL.open=id; var side=!wImg(id,"front")?"front":(!wImg(id,"back")?"back":"front"); f.setAttribute("data-s",side); f.click(); }
+function wlEdit(id){ WS.ret="wallet"; WL.open=id; sheetWalletEdit(id); }
+function wlDetails(id){ WL.flip=null; WS.ret=""; WS.rev=false; WS.side="front"; sheetWalletCard(id); }
 function sheetWallet(){
   var w=wl(); if(!WL.open||!wById(WL.open)) WL.open=w.cards[0].id;
   var st=w.cards.map(function(c,i){ return '<div class="wsi'+(WL.open===c.id?" open":"")+'" data-id="'+c.id+'" style="z-index:'+(i+1)+'" onclick="wlPick(\''+c.id+'\')"><div class="wfl'+(WL.flip===c.id?" fl":"")+'"><div class="wff">'+wVec(c)+'</div><div class="wfb">'+wBack(c)+'</div></div></div>'; }).join("");
-  sheet("Wallet",'<div class="mut" style="font-size:13.5px;margin:-4px 0 4px;line-height:1.45">Tes documents du véhicule. Touche une carte pour l’ouvrir, touche-la encore pour voir le scan.</div><div class="wst" id="wst">'+st+'</div><div id="wact">'+wActHTML(wById(WL.open))+'</div>'+
+  sheet("Wallet",'<div class="mut" style="font-size:13.5px;margin:-4px 0 4px;line-height:1.45">Tes documents du véhicule. Touche une carte pour l’ouvrir, touche-la encore pour voir le scan.</div><div class="wst" id="wst">'+st+'</div><div id="wact">'+wActHTML(wById(WL.open))+'</div><input id="wl_f" type="file" accept="image/*" hidden onchange="walletPhoto(WL.open,this.getAttribute(\'data-s\'),this)">'+
     '<button class="btn s full" style="margin-top:12px" onclick="walletAddOther()">'+FI.plus+' Ajouter un document</button>'+
     '<div class="pmr swr" style="margin-top:6px"><span><b>Flouter les scans</b><small>Les photos ne s’affichent qu’au toucher.</small></span><button class="sw'+(w.blur?" on":"")+'" aria-label="Flouter les scans" onclick="walletBlur(this)"></button></div>'+
     '<div class="mut" style="font-size:12px;line-height:1.45;margin-top:8px">Les scans ne quittent pas ton téléphone et ne sont pas inclus dans l’export des données.</div>',function(){ return true; },"Fermer"); sheetFooterClose();
@@ -4296,7 +4302,7 @@ function scStep2(){
 function scSave(){
   var url=SC.out.toDataURL("image/jpeg",0.86), id=SC.id, side=SC.side;
   if(!wImgSet(id,side,url)){ url=SC.out.toDataURL("image/jpeg",0.7); if(!wImgSet(id,side,url)){ toast("Espace de stockage insuffisant : carte non enregistrée",true); return false; } }
-  var c=wById(id); if(c&&!c.t0) c.t0=nowLocal(); if(c&&side==="front"){ var cc=scColors(SC.out); if(cc) c.col=cc; } save(); WS.side=side; WS.rev=true; SC.cv=null; SC.out=null; SC.rotSet=false; toast(side==="front"&&!wImg(id,"back")?"Recto enregistré · scanne maintenant le verso":"Carte numérisée"); WS.hint=(side==="front"&&!wImg(id,"back"))?"back":""; setTimeout(function(){ if(c&&!c.holder&&!c.num) sheetWalletEdit(id,true); else sheetWalletCard(id); },340); return true;
+  var c=wById(id); if(c&&!c.t0) c.t0=nowLocal(); if(c&&side==="front"){ var cc=scColors(SC.out); if(cc) c.col=cc; } save(); WS.side=side; WS.rev=true; SC.cv=null; SC.out=null; SC.rotSet=false; toast(side==="front"&&!wImg(id,"back")?"Recto enregistré · scanne maintenant le verso":"Carte numérisée"); WS.hint=(side==="front"&&!wImg(id,"back"))?"back":""; render(); setTimeout(function(){ if(c&&!c.holder&&!c.num) sheetWalletEdit(id,true); else if(WS.ret==="wallet"){ WS.ret=""; WL.open=id; sheetWallet(); } else sheetWalletCard(id); },340); return true;
 }
 function sheetWalletEdit(id,intro){
   var c=wById(id); if(!c) return;
@@ -4306,7 +4312,7 @@ function sheetWalletEdit(id,intro){
     '<label>Numéro</label><input id="w_num" value="'+esc(c.num||"")+'" placeholder="'+(c.type==="grise"?"Numéro de formule (facultatif)":"Numéro du permis (facultatif)")+'" autocomplete="off">'+
     '<label>Date de validité (facultatif)</label><input id="w_exp" type="date" value="'+esc(c.exp||"")+'">'+
     '<label>Note</label><input id="w_note" value="'+esc(c.note||"")+'" placeholder="ex. Rappel de renouvellement">',
-    function(){ if(c.type==="autre"){ c.title=v("w_title").trim()||"Document"; } c.holder=v("w_holder").trim(); c.num=v("w_num").trim(); c.exp=v("w_exp"); c.note=v("w_note").trim(); save(); setTimeout(function(){ sheetWalletCard(id); },340); return true; },"Enregistrer");
+    function(){ if(c.type==="autre"){ c.title=v("w_title").trim()||"Document"; } c.holder=v("w_holder").trim(); c.num=v("w_num").trim(); c.exp=v("w_exp"); c.note=v("w_note").trim(); save(); render(); setTimeout(function(){ if(WS.ret==="wallet"){ WS.ret=""; WL.open=id; sheetWallet(); } else sheetWalletCard(id); },340); return true; },"Enregistrer");
 }
 function walletAddOther(){ var w=wl(), c={id:uid(),type:"autre",title:"Document"}; w.cards.push(c); save(); sheetWalletEdit(c.id); }
 function walletClear(id){
