@@ -1,4 +1,4 @@
-# MG EHS – Carnet de bord (application installable)
+# MG EHS – Carnet de bord (application installable) · version 2.2
 
 ## Fichiers (tous à la racine, au même niveau)
 - `index.html` : l'application
@@ -16,7 +16,7 @@ Safari > bouton Partager > « Sur l'écran d'accueil ». L'app s'ouvre en plein 
 ## À savoir
 - Les données restent sur l'appareil (stockage local). Fais une sauvegarde dans Réglages > Données avant de changer d'adresse ou d'appareil : chaque adresse a ses propres données.
 - Le HTTPS est requis pour la localisation et le mode hors ligne (GitHub Pages le fournit).
-- Pour publier une mise à jour, remplace `index.html` et change `mg-ehs-v3` en `mg-ehs-v4` dans `sw.js`.
+- Pour publier une mise à jour, remplace `index.html` et change `mg-ehs-v5` en `mg-ehs-v5` dans `sw.js`.
 
 ## Wallet : export vers Apple Wallet
 - `Exporter · Apple Wallet` (dans le Wallet de l'app) propose l'**image PNG** de la carte (Photos / Fichiers) ou une **archive de pass à signer**.

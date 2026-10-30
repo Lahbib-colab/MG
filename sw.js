@@ -1,5 +1,5 @@
 // Mode hors ligne : l'application se charge sans connexion.
-const CACHE = "mg-ehs-v3";
+const CACHE = "mg-ehs-v5";
 const OCR = "mg-ocr-v1"; // moteur de lecture optique (gros fichiers) : conservé entre les versions
 const FILES = ["./","index.html","manifest.webmanifest","icon-192.png","icon-512.png","apple-touch-icon.png","favicon.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting())); });
