@@ -1,7 +1,7 @@
 // Mode hors ligne : l'application se charge sans connexion.
-const CACHE = "mg-ehs-v21";
+const CACHE = "mg-ehs-v30";
 const OCR = "mg-ocr-v1"; // moteur de lecture optique (gros fichiers) : conservé entre les versions
-const FILES = ["./","index.html","manifest.webmanifest","icon-192.png","icon-512.png","apple-touch-icon.png","favicon.png"];
+const FILES = ["./","index.html","manifest.webmanifest","icon-192.png","icon-512.png","apple-touch-icon.png","favicon.png","img/hero_l.webp","img/hero_d.webp","img/xray_l.webp","img/xray_d.webp","img/top_l.webp","img/top_d.webp","img/g1.webp","img/g2.webp","img/g3.webp","img/g4.webp","img/g5.webp","img/g6.webp","img/g7.webp","img/g8.webp","img/g9.webp","img/g10.webp"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE && k !== OCR).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener("fetch", e => {
