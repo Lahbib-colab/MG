@@ -1,0 +1,2 @@
+Ce dossier reçoit le moteur de lecture optique (voir scripts/fetch-ocr-assets.sh).
+Sans lui, les photos passent par « Texte en direct » de l'iPhone ou la saisie guidée ; les PDF avec texte fonctionnent dans tous les cas.
